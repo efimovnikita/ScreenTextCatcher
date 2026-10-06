@@ -27,3 +27,9 @@
 - **Конфигурация**: `System.Text.Json` (`settings.json` в `%APPDATA%\ScreenTextCatcher\`).
 - **История (100 записей)**: `Microsoft.Data.Sqlite` (`history.db` в `%APPDATA%\ScreenTextCatcher\`).
 - **Логирование**: `Serilog` с ротацией файлов логов в `%APPDATA%\ScreenTextCatcher\logs\` и потоком событий в диалог просмотра логов.
+
+## CI/CD и релизные пайплайны
+- **Платформа автоматизации**: GitHub Actions (Windows runner `windows-latest`).
+- **Непрерывная интеграция (CI)**: Автоматическая сборка и прогон xUnit тестов при каждом пуше и PR в `master`.
+- **Релизный пайплайн (Release)**: Публикация автономного single-file приложения `ScreenTextCatcher.exe` (`win-x64`) и упаковка в zip-архив при пуше тегов `v*` или ручном запуске (`workflow_dispatch`).
+
