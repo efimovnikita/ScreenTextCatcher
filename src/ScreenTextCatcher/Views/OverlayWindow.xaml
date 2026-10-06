@@ -1,0 +1,44 @@
+<Window x:Class="ScreenTextCatcher.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Background="#80000000"
+        Focusable="True">
+    
+    <Canvas x:Name="OverlayCanvas" Background="Transparent" 
+            MouseDown="OnCanvasMouseDown" 
+            MouseMove="OnCanvasMouseMove" 
+            MouseUp="OnCanvasMouseUp">
+        
+        <!-- Hint text -->
+        <Border x:Name="HintBorder" Background="#B0000000" CornerRadius="6" Padding="14,8" Canvas.Top="40">
+            <TextBlock Text="{DynamicResource Loc_OverlayHint}" 
+                       Foreground="#FFFFFF" FontSize="14" FontFamily="Segoe UI" FontWeight="SemiBold"/>
+        </Border>
+
+        <!-- Selection Rectangle (Bright contrasting Red) -->
+        <Rectangle x:Name="SelectionRect" 
+                   Stroke="#FF1744" 
+                   StrokeThickness="2" 
+                   Fill="#12FF1744" 
+                   Visibility="Collapsed"/>
+
+        <!-- Corner Indicators (Thick high-contrast Red brackets) -->
+        <Border x:Name="CornerTopLeft" Width="14" Height="14" 
+                BorderBrush="#FF1744" BorderThickness="3,3,0,0" Visibility="Collapsed"/>
+        <Border x:Name="CornerTopRight" Width="14" Height="14" 
+                BorderBrush="#FF1744" BorderThickness="0,3,3,0" Visibility="Collapsed"/>
+        <Border x:Name="CornerBottomLeft" Width="14" Height="14" 
+                BorderBrush="#FF1744" BorderThickness="3,0,0,3" Visibility="Collapsed"/>
+        <Border x:Name="CornerBottomRight" Width="14" Height="14" 
+                BorderBrush="#FF1744" BorderThickness="0,0,3,3" Visibility="Collapsed"/>
+
+        <!-- Dimensions badge -->
+        <Border x:Name="DimensionBadge" Background="#E6212121" BorderBrush="#FF1744" BorderThickness="1" CornerRadius="4" Padding="6,2" Visibility="Collapsed">
+            <TextBlock x:Name="TxtDimensions" Foreground="#FF5252" FontSize="11" FontFamily="Consolas" FontWeight="Bold"/>
+        </Border>
+    </Canvas>
+</Window>

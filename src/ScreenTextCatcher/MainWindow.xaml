@@ -1,0 +1,167 @@
+<Window x:Class="ScreenTextCatcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Loc_MainWindowTitle}"
+        Height="720" Width="920"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Visibility="Hidden"
+        Background="#1E1E1E">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="{DynamicResource Loc_MainHeaderTitle}" 
+                       FontSize="20" FontWeight="Bold" Foreground="#4EC9B0"/>
+            <TextBlock Text="{DynamicResource Loc_MainHeaderSubtitle}" 
+                       FontSize="13" Foreground="#9CDCFE" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Status & Settings Cards -->
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.4*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Config Card with direct inputs -->
+            <Border Grid.Column="0" Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Loc_SettingsCardTitle}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                    
+                    <!-- API Key Field -->
+                    <TextBlock Text="{DynamicResource Loc_ApiKeyLabel}" FontSize="12" Margin="0,0,0,3"/>
+                    <TextBox x:Name="TxtApiKey" Margin="0,0,0,8" ToolTip="{DynamicResource Loc_ApiKeyTooltip}"/>
+
+                    <!-- Proxy Settings -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <CheckBox x:Name="ChkProxyEnabled" Content="{DynamicResource Loc_UseProxy}" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <TextBlock Text="{DynamicResource Loc_ProxyType}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <ComboBox x:Name="CmbProxyType" Width="90" VerticalAlignment="Center">
+                            <ComboBoxItem Content="Http"/>
+                            <ComboBoxItem Content="Https"/>
+                            <ComboBoxItem Content="Socks5"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                            <TextBlock Text="{DynamicResource Loc_ProxyHost}" FontSize="11"/>
+                            <TextBox x:Name="TxtProxyHost"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{DynamicResource Loc_ProxyPort}" FontSize="11"/>
+                            <TextBox x:Name="TxtProxyPort"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                            <TextBlock Text="{DynamicResource Loc_ProxyUser}" FontSize="11"/>
+                            <TextBox x:Name="TxtProxyUser"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{DynamicResource Loc_ProxyPassword}" FontSize="11"/>
+                            <PasswordBox x:Name="TxtProxyPassword"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="{DynamicResource Loc_SaveSettings}" Click="OnSaveConfigClick" HorizontalAlignment="Left" Padding="12,5" Background="#0E639C"/>
+                </StackPanel>
+            </Border>
+
+            <!-- History Card -->
+            <Border Grid.Column="1" Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Loc_SqliteCardTitle}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="TxtHistoryPath" FontSize="11" Foreground="#808080" TextTrimming="CharacterEllipsis" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="TxtHistoryCount" FontSize="13" Foreground="#4EC9B0" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="{DynamicResource Loc_SqliteDescription}" FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Logs Live Stream -->
+        <Border Grid.Row="2" Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{DynamicResource Loc_LogStreamTitle}" FontWeight="Bold" Margin="0,0,0,8"/>
+                <TextBox Grid.Row="1" x:Name="TxtLogs" 
+                         IsReadOnly="True" 
+                         VerticalScrollBarVisibility="Auto" 
+                         HorizontalScrollBarVisibility="Auto"
+                         Background="#181818" 
+                         Foreground="#D4D4D4" 
+                         FontFamily="Consolas" 
+                         FontSize="12" 
+                         BorderThickness="0" 
+                         Padding="8"/>
+            </Grid>
+        </Border>
+
+        <!-- Actions Toolbar -->
+        <WrapPanel Grid.Row="3" Margin="0,12,0,0">
+            <Button Content="{DynamicResource Loc_BtnCapture}" Click="OnTestOverlayClick" Margin="0,0,10,10" Background="#6A1B9A"/>
+            <Button Content="{DynamicResource Loc_BtnSettings}" Click="OnOpenSettingsClick" Margin="0,0,10,10" Background="#007ACC"/>
+            <Button Content="{DynamicResource Loc_BtnHistory}" Click="OnOpenHistoryClick" Margin="0,0,10,10" Background="#2D7D9A"/>
+            <Button Content="{DynamicResource Loc_BtnLogs}" Click="OnOpenLogsClick" Margin="0,0,10,10" Background="#3E65A0"/>
+            <Button Content="{DynamicResource Loc_BtnTestPing}" Click="OnTestPingClick" Margin="0,0,10,10" Background="#2E7D32"/>
+            <Button Content="{DynamicResource Loc_BtnTestOcr}" Click="OnTestOcrClick" Margin="0,0,10,10" Background="#1565C0"/>
+            <Button Content="{DynamicResource Loc_BtnTestHistory}" Click="OnAddHistoryClick" Margin="0,0,10,10"/>
+            <Button Content="{DynamicResource Loc_BtnTestLog}" Click="OnAddLogClick" Margin="0,0,10,10"/>
+            <Button Content="{DynamicResource Loc_BtnOpenFolder}" Click="OnOpenFolderClick" Margin="0,0,10,10"/>
+        </WrapPanel>
+    </Grid>
+</Window>

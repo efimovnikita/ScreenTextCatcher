@@ -1,0 +1,158 @@
+<Window x:Class="ScreenTextCatcher.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Loc_SettingsTitle}" 
+        Height="620" Width="520"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#1E1E1E">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="{DynamicResource Loc_SettingsHeader}" FontSize="18" FontWeight="Bold" Foreground="#4EC9B0" Margin="0,0,0,14"/>
+
+        <!-- Settings Scroll/Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,10,0">
+
+                <!-- Mistral API Section -->
+                <Border Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Loc_MistralApiGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                        <TextBlock Text="{DynamicResource Loc_ApiKeyLabel}" FontSize="11" Margin="0,0,0,3"/>
+                        <TextBox x:Name="TxtApiKey" Margin="0,0,0,4"/>
+                        <TextBlock Text="{DynamicResource Loc_MistralApiHelp}" FontSize="10" Foreground="#808080"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Proxy Section -->
+                <Border Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Loc_ProxyGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <CheckBox x:Name="ChkProxyEnabled" Content="{DynamicResource Loc_UseProxy}" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="{DynamicResource Loc_ProxyType}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <ComboBox x:Name="CmbProxyType" Width="90" VerticalAlignment="Center">
+                                <ComboBoxItem Content="Http"/>
+                                <ComboBoxItem Content="Https"/>
+                                <ComboBoxItem Content="Socks5"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="{DynamicResource Loc_ProxyHost}" FontSize="11"/>
+                                <TextBox x:Name="TxtProxyHost"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{DynamicResource Loc_ProxyPort}" FontSize="11"/>
+                                <TextBox x:Name="TxtProxyPort"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="{DynamicResource Loc_ProxyUser}" FontSize="11"/>
+                                <TextBox x:Name="TxtProxyUser"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{DynamicResource Loc_ProxyPassword}" FontSize="11"/>
+                                <PasswordBox x:Name="TxtProxyPassword"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Content="{DynamicResource Loc_BtnTestPing}" Click="OnTestPingClick" HorizontalAlignment="Left" Background="#2E7D32"/>
+                        <TextBlock x:Name="TxtTestStatus" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Hotkey Section -->
+                <Border Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Loc_HotkeyGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                        <WrapPanel Margin="0,0,0,6">
+                            <CheckBox x:Name="ChkWin" Content="Win" Foreground="#FFFFFF" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="ChkShift" Content="Shift" Foreground="#FFFFFF" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="ChkCtrl" Content="Ctrl" Foreground="#FFFFFF" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="ChkAlt" Content="Alt" Foreground="#FFFFFF" Margin="0,0,12,0"/>
+                            <TextBlock Text="{DynamicResource Loc_KeyLabel}" VerticalAlignment="Center" Margin="8,0,5,0"/>
+                            <TextBox x:Name="TxtKey" Width="40" TextAlignment="Center" FontWeight="Bold"/>
+                        </WrapPanel>
+                        <TextBlock Text="{DynamicResource Loc_HotkeyHelp}" FontSize="10" Foreground="#808080"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Feedback & Language -->
+                <Border Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Loc_InterfaceAndSoundGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="ChkSound" Content="{DynamicResource Loc_SoundFeedback}" Foreground="#FFFFFF" Margin="0,0,0,8"/>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource Loc_AppLanguage}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox x:Name="CmbLanguage" Width="120">
+                                <ComboBoxItem Content="Русский"/>
+                                <ComboBoxItem Content="English"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="{DynamicResource Loc_BtnSave}" Click="OnSaveClick" Background="#0E639C" Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource Loc_BtnCancel}" Click="OnCancelClick"/>
+        </StackPanel>
+    </Grid>
+</Window>

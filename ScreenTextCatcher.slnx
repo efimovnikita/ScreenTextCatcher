@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ScreenTextCatcher.Core/ScreenTextCatcher.Core.csproj" />
+    <Project Path="src/ScreenTextCatcher/ScreenTextCatcher.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ScreenTextCatcher.Tests/ScreenTextCatcher.Tests.csproj" />
+  </Folder>
+</Solution>
