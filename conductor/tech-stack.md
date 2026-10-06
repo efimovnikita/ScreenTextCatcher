@@ -1,0 +1,29 @@
+# Tech Stack — ScreenTextCatcher
+
+## Базовая платформа и среда выполнения
+- **Язык**: C# 12 / 13
+- **Платформа**: .NET 9.0 (целевой фреймворк: `net9.0-windows`)
+- **Тип приложения**: Windows Desktop Application (фоновое приложение в трее без консоли)
+
+## Графический интерфейс (UI/UX)
+- **UI Фреймворк**: WPF (Windows Presentation Foundation)
+  - Полноэкранный прозрачный оверлей выбора области (`AllowsTransparency="True"`, `WindowStyle="None"`, 50% затемнение, Canvas с контрастной рамкой).
+  - Компактные минималистичные окна: Настройки (Settings), Просмотр логов (Log Viewer), История (History).
+- **Системный трей**: Интеграция с треем Windows с контекстным меню и индикацией статуса.
+- **Глобальные хоткеи**: Win32 P/Invoke (`RegisterHotKey` / `UnregisterHotKey`) через `HwndSource`.
+
+## Сеть, OCR и захват экрана
+- **Сетевой клиент**: `System.Net.Http.HttpClient` с `SocketsHttpHandler`:
+  - Поддержка HTTP/HTTPS и SOCKS5 прокси (`WebProxy`, `socks5://`).
+  - Методы тестирования подключения к прокси и проверки Mistral API ключа.
+- **OCR Сервис**: Mistral OCR Cloud API:
+  - Отправка вырезанного фрагмента изображения в base64 в памяти.
+  - Автоматическое копирование распознанного текста в `System.Windows.Clipboard`.
+- **Захват экрана в RAM**:
+  - `Graphics.CopyFromScreen` / Win32 `BitBlt` для захвата мониторов с учетом DPI.
+  - Кадрирование и кодирование в `MemoryStream` (строго без сохранения на диск).
+
+## Хранение данных и логирование
+- **Конфигурация**: `System.Text.Json` (`settings.json` в `%APPDATA%\ScreenTextCatcher\`).
+- **История (100 записей)**: `Microsoft.Data.Sqlite` (`history.db` в `%APPDATA%\ScreenTextCatcher\`).
+- **Логирование**: `Serilog` с ротацией файлов логов в `%APPDATA%\ScreenTextCatcher\logs\` и потоком событий в диалог просмотра логов.
