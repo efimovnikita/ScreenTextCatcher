@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Публикация локального репозитория ScreenTextCatcher на GitHub с CI/CD и сборкой релизов**
+- [x] **Track: Публикация локального репозитория ScreenTextCatcher на GitHub с CI/CD и сборкой релизов**
 *Link: [./tracks/github_publish_20261006/](./tracks/github_publish_20261006/)*
