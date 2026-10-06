@@ -22,12 +22,12 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Настройка GitHub Actions (CI & Release)' (Protocol in workflow.md)
 
 ## Phase 3: Публикация репозитория на GitHub
-- [~] Task: Фиксация подготовительных файлов
-    - [~] Закоммитить LICENSE, README.md и GitHub Actions workflows в локальную ветку `master`
-- [ ] Task: Создание публичного репозитория через GitHub CLI (`gh`)
-    - [ ] Выполнить создание публичного репозитория `efimovnikita/ScreenTextCatcher` с описанием и привязкой remote `origin`
-- [ ] Task: Пуш ветки master и верификация
-    - [ ] Выполнить отправку изменений в репозиторий (`git push -u origin master`)
-    - [ ] Проверить доступность репозитория через `gh repo view`
-    - [ ] Проверить запуск и статус пайплайна GitHub Actions через `gh run list`
+- [x] Task: Фиксация подготовительных файлов
+    - [x] Закоммитить LICENSE, README.md и GitHub Actions workflows в локальную ветку `master`
+- [x] Task: Создание публичного репозитория через GitHub CLI (`gh`)
+    - [x] Выполнить создание публичного репозитория `efimovnikita/ScreenTextCatcher` с описанием и привязкой remote `origin`
+- [~] Task: Пуш ветки master и верификация
+    - [~] Выполнить отправку изменений в репозиторий (`git push -u origin master`)
+    - [~] Проверить доступность репозитория через `gh repo view`
+    - [~] Проверить запуск и статус пайплайна GitHub Actions через `gh run list`
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Публикация репозитория на GitHub' (Protocol in workflow.md)
