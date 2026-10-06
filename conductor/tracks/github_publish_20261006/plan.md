@@ -26,8 +26,11 @@
     - [x] Закоммитить LICENSE, README.md и GitHub Actions workflows в локальную ветку `master`
 - [x] Task: Создание публичного репозитория через GitHub CLI (`gh`)
     - [x] Выполнить создание публичного репозитория `efimovnikita/ScreenTextCatcher` с описанием и привязкой remote `origin`
-- [~] Task: Пуш ветки master и верификация
-    - [~] Выполнить отправку изменений в репозиторий (`git push -u origin master`)
-    - [~] Проверить доступность репозитория через `gh repo view`
-    - [~] Проверить запуск и статус пайплайна GitHub Actions через `gh run list`
+- [x] Task: Пуш ветки master и верификация
+    - [x] Выполнить отправку изменений в репозиторий (`git push -u origin master`)
+    - [x] Проверить доступность репозитория через `gh repo view`
+    - [x] Проверить запуск и статус пайплайна GitHub Actions через `gh run list`
+- [~] Task: Создание и публикация первого релиза v1.0.0
+    - [~] Создать git-тег v1.0.0 и отправить его на GitHub
+    - [ ] Дождаться завершения Release workflow и верифицировать GitHub Release
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Публикация репозитория на GitHub' (Protocol in workflow.md)
