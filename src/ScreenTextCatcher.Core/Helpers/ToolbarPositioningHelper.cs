@@ -10,12 +10,14 @@ public static class ToolbarPositioningHelper {
       Rect screenBounds,
       double margin = 8.0) {
     double y = selection.Bottom + margin;
-    if (y + toolbar.Height > screenBounds.Bottom) {
+    if (y + toolbar.Height > screenBounds.Bottom - margin) {
       double yAbove = selection.Top - toolbar.Height - margin;
-      if (yAbove >= screenBounds.Top) {
+      if (yAbove >= screenBounds.Top + margin) {
         y = yAbove;
       } else {
-        y = Math.Clamp(y, screenBounds.Top, Math.Max(screenBounds.Top, screenBounds.Bottom - toolbar.Height));
+        double minY = screenBounds.Top + margin;
+        double maxY = Math.Max(minY, screenBounds.Bottom - toolbar.Height - margin);
+        y = Math.Clamp(y, minY, maxY);
       }
     }
 
@@ -24,8 +26,9 @@ public static class ToolbarPositioningHelper {
       x = selection.Left;
     }
 
-    double maxX = Math.Max(screenBounds.Left, screenBounds.Right - toolbar.Width);
-    x = Math.Clamp(x, screenBounds.Left, maxX);
+    double minX = screenBounds.Left + margin;
+    double maxX = Math.Max(minX, screenBounds.Right - toolbar.Width - margin);
+    x = Math.Clamp(x, minX, maxX);
 
     return new Point(x, y);
   }

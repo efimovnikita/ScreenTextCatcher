@@ -279,16 +279,21 @@ public partial class OverlayWindow : Window {
       }
 
       // Position Toolbar
+      AnnotationToolbar.Visibility = Visibility.Visible;
       AnnotationToolbar.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
       var tbSize = AnnotationToolbar.DesiredSize;
+      if (tbSize.Width <= 0 || tbSize.Height <= 0) {
+        tbSize = new System.Windows.Size(320, 42);
+      }
+
+      var monitorBounds = GetActiveMonitorCanvasBounds(_selectedAreaRect);
       var tbPos = ToolbarPositioningHelper.CalculatePosition(
           _selectedAreaRect,
           tbSize,
-          new Rect(0, 0, Width, Height));
+          monitorBounds);
 
       Canvas.SetLeft(AnnotationToolbar, tbPos.X);
       Canvas.SetTop(AnnotationToolbar, tbPos.Y);
-      AnnotationToolbar.Visibility = Visibility.Visible;
 
       // Default state: no active tool, arrow cursor
       SetActiveTool(AnnotationTool.None);
@@ -483,5 +488,30 @@ public partial class OverlayWindow : Window {
     curMs.Position = 0;
     _cachedRedCrosshair = new System.Windows.Input.Cursor(curMs);
     return _cachedRedCrosshair;
+  }
+
+  private Rect GetActiveMonitorCanvasBounds(Rect selectionRect) {
+    try {
+      var scaleX = _dpiScaleX > 0 ? _dpiScaleX : 1.0;
+      var scaleY = _dpiScaleY > 0 ? _dpiScaleY : 1.0;
+
+      var screenX = (int)Math.Round((Left + selectionRect.X) * scaleX);
+      var screenY = (int)Math.Round((Top + selectionRect.Y) * scaleY);
+      var screenW = (int)Math.Max(1, Math.Round(selectionRect.Width * scaleX));
+      var screenH = (int)Math.Max(1, Math.Round(selectionRect.Height * scaleY));
+
+      var rect = new Rectangle(screenX, screenY, screenW, screenH);
+      var screen = System.Windows.Forms.Screen.FromRectangle(rect);
+
+      var bounds = screen.Bounds;
+      var canvasX = (bounds.X / scaleX) - Left;
+      var canvasY = (bounds.Y / scaleY) - Top;
+      var canvasW = bounds.Width / scaleX;
+      var canvasH = bounds.Height / scaleY;
+
+      return new Rect(canvasX, canvasY, canvasW, canvasH);
+    } catch {
+      return new Rect(0, 0, Width, Height);
+    }
   }
 }
