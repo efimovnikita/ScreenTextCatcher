@@ -11,6 +11,7 @@
   - Компактные минималистичные окна: Настройки (Settings), Просмотр логов (Log Viewer), История (History).
 - **Системный трей**: Интеграция с треем Windows с контекстным меню и индикацией статуса.
 - **Глобальные хоткеи**: Win32 P/Invoke (`RegisterHotKey` / `UnregisterHotKey`) через `HwndSource`.
+- **Автозапуск Windows**: Win32 COM Interop (`IShellLinkW` / `IPersistFile`) для генерации ярлыков в `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` без сторонних зависимостей.
 
 ## Сеть, OCR и захват экрана
 - **Сетевой клиент**: `System.Net.Http.HttpClient` с `SocketsHttpHandler`:
