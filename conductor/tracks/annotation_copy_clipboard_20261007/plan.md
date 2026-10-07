@@ -45,4 +45,4 @@
 - [x] Task: Создание релиза в Git и триггер публикации на GitHub
     - [x] Создать аннотированный Git-тег `v1.2.0`
     - [x] Отправить изменения и тег в GitHub (`git push origin master --tags`) для автоматического запуска GitHub Actions сборки релиза `ScreenTextCatcher.exe`
-- [~] Task: Conductor - User Manual Verification 'Подготовка релиза и публикация новой версии (v1.2.0)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Подготовка релиза и публикация новой версии (v1.2.0)' (Protocol in workflow.md)

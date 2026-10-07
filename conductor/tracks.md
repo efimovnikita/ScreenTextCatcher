@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Кнопка копирования изображения в буфер обмена на панели аннотаций**
+- [x] **Track: Кнопка копирования изображения в буфер обмена на панели аннотаций**
 *Link: [./tracks/annotation_copy_clipboard_20261007/](./tracks/annotation_copy_clipboard_20261007/)*
