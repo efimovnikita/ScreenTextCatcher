@@ -81,6 +81,8 @@ public static class LocalizationManager
         ["Loc_AnnotateToolbarRect"] = "Рамка",
         ["Loc_AnnotateToolbarArrow"] = "Стрелка",
         ["Loc_AnnotateToolbarUndo"] = "Отменить действие (Ctrl+Z)",
+        ["Loc_AnnotateToolbarCopy"] = "Копировать",
+        ["Loc_AnnotateToolbarCopyTooltip"] = "Скопировать изображение в буфер обмена и сохранить на диск",
         ["Loc_AnnotateToolbarDone"] = "Сохранить (Enter)",
         ["Loc_AnnotateToolbarCancel"] = "Отмена (Esc)",
 
@@ -92,6 +94,7 @@ public static class LocalizationManager
         ["Loc_BtnBrowse"] = "Обзор...",
         ["Loc_BtnOpenScreenshotFolder"] = "📂 Открыть папку скриншотов",
         ["Loc_LogScreenshotSaved"] = "Скриншот сохранён: {0}",
+        ["Loc_LogScreenshotImageCopied"] = "Скриншот сохранён на диск и скопирован в буфер обмена как изображение: {0}",
         ["Loc_NotificationScreenshotErrorTitle"] = "Ошибка сохранения скриншота",
         ["Loc_NotificationScreenshotErrorMsg"] = "Не удалось сохранить скриншот: {0}",
         ["Loc_ClipboardDelimiterLabel"] = "Разделитель путей в буфере:",
@@ -196,6 +199,8 @@ public static class LocalizationManager
         ["Loc_AnnotateToolbarRect"] = "Rectangle",
         ["Loc_AnnotateToolbarArrow"] = "Arrow",
         ["Loc_AnnotateToolbarUndo"] = "Undo (Ctrl+Z)",
+        ["Loc_AnnotateToolbarCopy"] = "Copy",
+        ["Loc_AnnotateToolbarCopyTooltip"] = "Copy image to clipboard and save to disk",
         ["Loc_AnnotateToolbarDone"] = "Save (Enter)",
         ["Loc_AnnotateToolbarCancel"] = "Cancel (Esc)",
 
@@ -207,6 +212,7 @@ public static class LocalizationManager
         ["Loc_BtnBrowse"] = "Browse...",
         ["Loc_BtnOpenScreenshotFolder"] = "📂 Open Screenshots Folder",
         ["Loc_LogScreenshotSaved"] = "Screenshot saved: {0}",
+        ["Loc_LogScreenshotImageCopied"] = "Screenshot saved to disk and copied to clipboard as image: {0}",
         ["Loc_NotificationScreenshotErrorTitle"] = "Screenshot Save Error",
         ["Loc_NotificationScreenshotErrorMsg"] = "Failed to save screenshot: {0}",
         ["Loc_ClipboardDelimiterLabel"] = "Clipboard path delimiter:",

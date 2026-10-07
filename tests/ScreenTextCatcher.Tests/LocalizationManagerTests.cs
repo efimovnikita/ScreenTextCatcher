@@ -96,4 +96,19 @@ public class LocalizationManagerTests
         Assert.Equal("Save (Enter)", LocalizationManager.GetString("Loc_AnnotateToolbarDone"));
         Assert.Equal("Cancel (Esc)", LocalizationManager.GetString("Loc_AnnotateToolbarCancel"));
     }
+
+    [Fact]
+    public void AnnotationToolbarCopy_Keys_ExistInBothLanguages()
+    {
+        LocalizationManager.SetLanguage("ru");
+        Assert.Equal("Копировать", LocalizationManager.GetString("Loc_AnnotateToolbarCopy"));
+        Assert.Equal("Скопировать изображение в буфер обмена и сохранить на диск", LocalizationManager.GetString("Loc_AnnotateToolbarCopyTooltip"));
+        Assert.Equal("Скриншот сохранён на диск и скопирован в буфер обмена как изображение: {0}", LocalizationManager.GetString("Loc_LogScreenshotImageCopied"));
+
+        LocalizationManager.SetLanguage("en");
+        Assert.Equal("Copy", LocalizationManager.GetString("Loc_AnnotateToolbarCopy"));
+        Assert.Equal("Copy image to clipboard and save to disk", LocalizationManager.GetString("Loc_AnnotateToolbarCopyTooltip"));
+        Assert.Equal("Screenshot saved to disk and copied to clipboard as image: {0}", LocalizationManager.GetString("Loc_LogScreenshotImageCopied"));
+    }
 }
+

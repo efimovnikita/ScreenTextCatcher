@@ -210,5 +210,47 @@ public class ScreenshotServiceTests : IDisposable
         var path2 = service2.SaveAndAccumulateClipboard(fakePng, _tempFolder, ClipboardDelimiter.Space);
         capturedClipboard.Should().Be($"{path1} {path2}");
     }
+
+    [Fact]
+    public void SaveAndCopyImageToClipboard_SavesFileAndInvokesImageClipboardSetter()
+    {
+        byte[]? capturedImageBytes = null;
+        var fixedTime = new DateTime(2026, 10, 7, 15, 0, 0);
+
+        var service = new ScreenshotService(
+            timeProvider: () => fixedTime,
+            imageClipboardSetter: bytes => capturedImageBytes = bytes);
+
+        var fakePng = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x01, 0x02, 0x03, 0x04 };
+        var savedPath = service.SaveAndCopyImageToClipboard(fakePng, _tempFolder);
+
+        File.Exists(savedPath).Should().BeTrue();
+        Path.GetFileName(savedPath).Should().Be("Screenshot_20261007_150000.png");
+        File.ReadAllBytes(savedPath).Should().Equal(fakePng);
+        capturedImageBytes.Should().NotBeNull();
+        capturedImageBytes.Should().Equal(fakePng);
+    }
+
+    [Fact]
+    public void SaveAndCopyImageToClipboard_HandlesCollisionAndReturnsUniquePath()
+    {
+        byte[]? capturedImageBytes = null;
+        var fixedTime = new DateTime(2026, 10, 7, 15, 0, 0);
+
+        var service = new ScreenshotService(
+            timeProvider: () => fixedTime,
+            imageClipboardSetter: bytes => capturedImageBytes = bytes);
+
+        var fakePng = new byte[] { 10, 20, 30 };
+        var path1 = service.SaveAndCopyImageToClipboard(fakePng, _tempFolder);
+        var path2 = service.SaveAndCopyImageToClipboard(fakePng, _tempFolder);
+
+        Path.GetFileName(path1).Should().Be("Screenshot_20261007_150000.png");
+        Path.GetFileName(path2).Should().Be("Screenshot_20261007_150000_1.png");
+        File.Exists(path1).Should().BeTrue();
+        File.Exists(path2).Should().BeTrue();
+        capturedImageBytes.Should().Equal(fakePng);
+    }
 }
+
 

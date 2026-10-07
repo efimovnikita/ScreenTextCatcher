@@ -139,4 +139,63 @@ public class EndToEndWorkflowTests : IDisposable
             }
         }
     }
+
+    [Fact]
+    public void FullWorkflow_ScreenshotWithAnnotations_SaveAndCopyImage_CopiesImageDirectlyAndSavesFile()
+    {
+        var tempFolder = Path.Combine(Path.GetTempPath(), "ScreenTextCatcher_E2E_CopyImg_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempFolder);
+
+        try
+        {
+            byte[]? pngBytes = null;
+            byte[]? clipboardImageBytes = null;
+            string? clipboardText = null;
+
+            var thread = new Thread(() =>
+            {
+                var canvas = new System.Windows.Controls.Canvas
+                {
+                    Width = 300,
+                    Height = 200,
+                    ClipToBounds = true
+                };
+
+                var rect = Core.Helpers.AnnotationGeometryHelper.CreateRectangle(
+                    new System.Windows.Point(10, 10),
+                    new System.Windows.Point(80, 60));
+                canvas.Children.Add(rect);
+
+                canvas.Measure(new System.Windows.Size(300, 200));
+                canvas.Arrange(new System.Windows.Rect(0, 0, 300, 200));
+
+                pngBytes = Core.Helpers.AnnotationExportHelper.RenderVisualToPng(canvas, 300, 200);
+
+                var screenshotService = new ScreenshotService(
+                    imageClipboardSetter: bytes => clipboardImageBytes = bytes,
+                    clipboardSetter: text => clipboardText = text);
+
+                var savedPath = screenshotService.SaveAndCopyImageToClipboard(pngBytes, tempFolder);
+
+                File.Exists(savedPath).Should().BeTrue();
+                new FileInfo(savedPath).Length.Should().BeGreaterThan(0);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            pngBytes.Should().NotBeNull();
+            clipboardImageBytes.Should().NotBeNull();
+            clipboardImageBytes.Should().Equal(pngBytes);
+            clipboardText.Should().BeNull(); // Text paths must NOT be accumulated
+        }
+        finally
+        {
+            if (Directory.Exists(tempFolder))
+            {
+                try { Directory.Delete(tempFolder, true); } catch { }
+            }
+        }
+    }
 }
+

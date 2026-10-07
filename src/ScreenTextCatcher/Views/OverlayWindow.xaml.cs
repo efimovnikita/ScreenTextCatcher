@@ -52,7 +52,7 @@ public partial class OverlayWindow : Window {
   private double _dpiScaleY = 1.0;
 
   public event Action<Rectangle>? AreaSelected;
-  public event Action<byte[]>? ScreenshotReady;
+  public event Action<byte[], bool>? ScreenshotReady;
   public event Action? Cancelled;
 
   public OverlayWindow(bool isScreenshotMode = false) {
@@ -111,7 +111,7 @@ public partial class OverlayWindow : Window {
 
     if (_state == OverlayState.Annotating) {
       if (e.Key == Key.Enter) {
-        FinishAndExportScreenshot();
+        FinishAndExportScreenshot(copyImageToClipboard: false);
         return;
       }
 
@@ -368,15 +368,19 @@ public partial class OverlayWindow : Window {
     }
   }
 
+  private void OnCopyImageClick(object sender, RoutedEventArgs e) {
+    FinishAndExportScreenshot(copyImageToClipboard: true);
+  }
+
   private void OnDoneClick(object sender, RoutedEventArgs e) {
-    FinishAndExportScreenshot();
+    FinishAndExportScreenshot(copyImageToClipboard: false);
   }
 
   private void OnCancelClick(object sender, RoutedEventArgs e) {
     CancelSelection();
   }
 
-  private void FinishAndExportScreenshot() {
+  private void FinishAndExportScreenshot(bool copyImageToClipboard = false) {
     byte[] pngBytes;
 
     var cropX = (int)Math.Max(0, _selectedAreaRect.Left * _dpiScaleX);
@@ -411,7 +415,7 @@ public partial class OverlayWindow : Window {
     }
 
     Close();
-    ScreenshotReady?.Invoke(pngBytes);
+    ScreenshotReady?.Invoke(pngBytes, copyImageToClipboard);
   }
 
   private void CancelSelection() {

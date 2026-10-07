@@ -242,22 +242,37 @@ public partial class MainWindow : Window
 
         if (isScreenshot)
         {
-            overlay.ScreenshotReady += pngBytes =>
+            overlay.ScreenshotReady += (pngBytes, copyImageToClipboard) =>
             {
                 Dispatcher.Invoke(() =>
                 {
                     try
                     {
                         var s = _configService.CurrentSettings;
-                        Log.Information("Режим скриншотов: сохранение области с аннотациями на диск и аккумуляция в буфере обмена...");
                         var folder = s.GetEffectiveScreenshotFolder();
-                        var savedFilePath = _screenshotService.SaveAndAccumulateClipboard(pngBytes, folder, s.ClipboardDelimiter);
-                        if (s.SoundFeedback)
+
+                        if (copyImageToClipboard)
                         {
-                            System.Media.SystemSounds.Asterisk.Play();
+                            Log.Information("Режим скриншотов: сохранение области на диск и копирование изображения в буфер обмена...");
+                            var savedFilePath = _screenshotService.SaveAndCopyImageToClipboard(pngBytes, folder);
+                            if (s.SoundFeedback)
+                            {
+                                System.Media.SystemSounds.Asterisk.Play();
+                            }
+                            _trayManager?.SetStatus(TrayStatus.Idle);
+                            Log.Information(string.Format(LocalizationManager.GetString("Loc_LogScreenshotImageCopied"), savedFilePath));
                         }
-                        _trayManager?.SetStatus(TrayStatus.Idle);
-                        Log.Information(string.Format(LocalizationManager.GetString("Loc_LogScreenshotSaved"), savedFilePath));
+                        else
+                        {
+                            Log.Information("Режим скриншотов: сохранение области с аннотациями на диск и аккумуляция в буфере обмена...");
+                            var savedFilePath = _screenshotService.SaveAndAccumulateClipboard(pngBytes, folder, s.ClipboardDelimiter);
+                            if (s.SoundFeedback)
+                            {
+                                System.Media.SystemSounds.Asterisk.Play();
+                            }
+                            _trayManager?.SetStatus(TrayStatus.Idle);
+                            Log.Information(string.Format(LocalizationManager.GetString("Loc_LogScreenshotSaved"), savedFilePath));
+                        }
                     }
                     catch (Exception ex)
                     {

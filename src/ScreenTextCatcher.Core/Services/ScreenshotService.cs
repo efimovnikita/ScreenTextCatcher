@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using ScreenTextCatcher.Core.Models;
 using Serilog;
 
@@ -11,15 +12,18 @@ public class ScreenshotService : IScreenshotService
     private readonly Func<DateTime> _timeProvider;
     private readonly Action<string> _clipboardSetter;
     private readonly Func<string?> _clipboardGetter;
+    private readonly Action<byte[]> _imageClipboardSetter;
 
     public ScreenshotService(
         Func<DateTime>? timeProvider = null,
         Action<string>? clipboardSetter = null,
-        Func<string?>? clipboardGetter = null)
+        Func<string?>? clipboardGetter = null,
+        Action<byte[]>? imageClipboardSetter = null)
     {
         _timeProvider = timeProvider ?? (() => DateTime.Now);
         _clipboardSetter = clipboardSetter ?? SetClipboardWithRetry;
         _clipboardGetter = clipboardGetter ?? GetClipboardTextSafe;
+        _imageClipboardSetter = imageClipboardSetter ?? SetImageClipboardWithRetry;
     }
 
     public string SaveScreenshot(byte[] pngBytes, string folderPath)
@@ -171,6 +175,13 @@ public class ScreenshotService : IScreenshotService
         return savedFilePath;
     }
 
+    public string SaveAndCopyImageToClipboard(byte[] pngBytes, string folderPath)
+    {
+        var savedFilePath = SaveScreenshot(pngBytes, folderPath);
+        _imageClipboardSetter(pngBytes);
+        return savedFilePath;
+    }
+
     private static void SetClipboardWithRetry(string text)
     {
         for (int i = 0; i < 5; i++)
@@ -186,6 +197,39 @@ public class ScreenshotService : IScreenshotService
                 {
                     Log.Warning(ex, "Failed to set clipboard text after 5 attempts.");
                     throw;
+                }
+                Thread.Sleep(50);
+            }
+        }
+    }
+
+    private static void SetImageClipboardWithRetry(byte[] pngBytes)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            try
+            {
+                using var stream = new MemoryStream(pngBytes);
+                var bitmapDecoder = BitmapDecoder.Create(
+                    stream,
+                    BitmapCreateOptions.None,
+                    BitmapCacheOption.OnLoad);
+                var bitmapFrame = bitmapDecoder.Frames[0];
+                bitmapFrame.Freeze();
+
+                var dataObject = new DataObject();
+                dataObject.SetData(DataFormats.Bitmap, bitmapFrame, true);
+                dataObject.SetData("PNG", new MemoryStream(pngBytes), false);
+
+                Clipboard.SetDataObject(dataObject, true);
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (i == 4)
+                {
+                    Log.Warning(ex, "Failed to copy image to clipboard after 5 attempts.");
+                    return;
                 }
                 Thread.Sleep(50);
             }
