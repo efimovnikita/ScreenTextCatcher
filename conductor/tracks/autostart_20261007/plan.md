@@ -41,8 +41,8 @@
 - [x] Task: Подготовка коммита изменений трека
     - [x] Проверить статус репозитория и отсутствие лишних файлов
     - [x] Закоммитить изменения трека согласно протоколу коммитов с подробной сводкой изменений
-- [~] Task: Создание git-тега v1.1.0 и публикация релиза на GitHub
-    - [~] Создать git-тег `v1.1.0` с описанием релиза
-    - [ ] Отправить тег на GitHub (`git push origin v1.1.0`)
-    - [ ] Дождаться завершения workflow в GitHub Actions и верифицировать создание релиза и дистрибутива `ScreenTextCatcher-win-x64.zip`
-- [ ] Task: Conductor - User Manual Verification 'Фаза 4: Выпуск релиза на GitHub' (Protocol in workflow.md)
+- [x] Task: Создание git-тега v1.1.0 и публикация релиза на GitHub
+    - [x] Создать git-тег `v1.1.0` с описанием релиза
+    - [x] Отправить тег на GitHub (`git push origin v1.1.0`)
+    - [x] Дождаться завершения workflow в GitHub Actions и верифицировать создание релиза и дистрибутива `ScreenTextCatcher-win-x64.zip`
+- [x] Task: Conductor - User Manual Verification 'Фаза 4: Выпуск релиза на GitHub' (Protocol in workflow.md)

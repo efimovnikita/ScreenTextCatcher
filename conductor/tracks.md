@@ -9,6 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Опция автозапуска приложения при старте Windows и выпуск релиза v1.1.0**
+- [x] **Track: Опция автозапуска приложения при старте Windows и выпуск релиза v1.1.0**
   *Link: [./tracks/autostart_20261007/](./tracks/autostart_20261007/)*
 
