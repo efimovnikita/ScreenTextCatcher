@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource Loc_MainWindowTitle}"
+        Icon="pack://application:,,,/Assets/app.ico"
         Height="720" Width="920"
         WindowStartupLocation="CenterScreen"
         Topmost="True"

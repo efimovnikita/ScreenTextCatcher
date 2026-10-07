@@ -42,7 +42,7 @@ public class TrayIconManager : IDisposable
         _configService = configService ?? new ConfigurationService();
         _autoStartService = autoStartService ?? new AutoStartService();
 
-        GenerateIcons();
+        LoadIcons();
 
         _contextMenu = new ContextMenuStrip();
         BuildContextMenu();
@@ -71,34 +71,44 @@ public class TrayIconManager : IDisposable
         BuildContextMenu();
     }
 
-    private void GenerateIcons()
+    private void LoadIcons()
     {
-        _idleIcon = CreateSolidColorIcon(Color.FromArgb(0, 150, 255), "T");
-        _busyIcon = CreateSolidColorIcon(Color.FromArgb(255, 180, 0), "⏳");
-        _errorIcon = CreateSolidColorIcon(Color.FromArgb(240, 50, 50), "!");
+        _idleIcon = LoadIconResource("tray_idle.ico") ?? SystemIcons.Application;
+        _busyIcon = LoadIconResource("tray_busy.ico") ?? _idleIcon;
+        _errorIcon = LoadIconResource("tray_error.ico") ?? SystemIcons.Error;
     }
 
-    private static Icon CreateSolidColorIcon(Color bg, string label)
+    private static Icon? LoadIconResource(string name)
     {
-        using var bmp = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bmp))
+        try
         {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            using var brush = new SolidBrush(bg);
-            g.FillEllipse(brush, 2, 2, 28, 28);
-
-            using var font = new Font("Arial", 14, FontStyle.Bold);
-            using var textBrush = new SolidBrush(Color.White);
-            using var sf = new StringFormat
+            var uri = new Uri($"pack://application:,,,/ScreenTextCatcher;component/Assets/{name}", UriKind.Absolute);
+            var streamInfo = System.Windows.Application.GetResourceStream(uri);
+            if (streamInfo?.Stream != null)
             {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            };
-            g.DrawString(label, font, textBrush, new RectangleF(0, 0, 32, 32), sf);
+                using var stream = streamInfo.Stream;
+                return new Icon(stream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Не удалось загрузить иконку {Name} из ресурсов сборки", name);
         }
 
-        var hIcon = bmp.GetHicon();
-        return Icon.FromHandle(hIcon);
+        try
+        {
+            var localPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", name);
+            if (System.IO.File.Exists(localPath))
+            {
+                return new Icon(localPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Не удалось загрузить иконку {Name} из локального каталога Assets", name);
+        }
+
+        return null;
     }
 
     private void BuildContextMenu()
@@ -275,7 +285,13 @@ public class TrayIconManager : IDisposable
         _contextMenu.Dispose();
 
         _idleIcon?.Dispose();
-        _busyIcon?.Dispose();
-        _errorIcon?.Dispose();
+        if (!ReferenceEquals(_busyIcon, _idleIcon))
+        {
+            _busyIcon?.Dispose();
+        }
+        if (!ReferenceEquals(_errorIcon, _idleIcon))
+        {
+            _errorIcon?.Dispose();
+        }
     }
 }
