@@ -33,4 +33,5 @@ public class AppSettings
     public HotkeySettings Hotkey { get; set; } = new();
     public bool SoundFeedback { get; set; } = true;
     public string Language { get; set; } = "ru";
+    public bool AutoStart { get; set; } = false;
 }

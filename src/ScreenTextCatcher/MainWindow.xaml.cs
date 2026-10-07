@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private readonly IConfigurationService _configService;
     private readonly IHistoryService _historyService;
     private readonly ScreenCaptureService _captureService;
+    private readonly IAutoStartService _autoStartService;
 
     private TrayIconManager? _trayManager;
     private HotkeyManager? _hotkeyManager;
@@ -32,6 +33,14 @@ public partial class MainWindow : Window
         _configService = new ConfigurationService();
         _historyService = new HistoryService();
         _captureService = new ScreenCaptureService();
+        _autoStartService = new AutoStartService();
+
+        // Synchronize autostart shortcut if enabled in settings
+        if (_configService.CurrentSettings.AutoStart && !_autoStartService.IsAutoStartEnabled())
+        {
+            Log.Information("Автозапуск включен в настройках, но ярлык отсутствует или не актуален. Обновление ярлыка...");
+            _autoStartService.EnableAutoStart();
+        }
 
         LocalizationManager.SetLanguage(_configService.CurrentSettings.Language);
         LocalizationManager.LanguageChanged += UpdateUiState;
@@ -45,7 +54,7 @@ public partial class MainWindow : Window
         AppLogger.InMemorySink.LogEmitted += OnLogReceived;
 
         // Initialize Tray Manager
-        _trayManager = new TrayIconManager(_historyService);
+        _trayManager = new TrayIconManager(_historyService, _configService, _autoStartService);
         _trayManager.CaptureRequested += () => Dispatcher.Invoke(StartOcrCapture);
         _trayManager.SettingsRequested += () => Dispatcher.Invoke(OpenSettingsDialog);
         _trayManager.HistoryRequested += () => Dispatcher.Invoke(OpenHistoryDialog);
@@ -381,7 +390,7 @@ public partial class MainWindow : Window
 
     public void OpenSettingsDialog()
     {
-        var settingsWin = new SettingsWindow(_configService);
+        var settingsWin = new SettingsWindow(_configService, _autoStartService);
         if (IsVisible)
         {
             settingsWin.Owner = this;

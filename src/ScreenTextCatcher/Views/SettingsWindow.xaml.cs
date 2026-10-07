@@ -9,15 +9,17 @@ namespace ScreenTextCatcher.Views;
 public partial class SettingsWindow : Window
 {
     private readonly IConfigurationService _configService;
+    private readonly IAutoStartService _autoStartService;
     private readonly ProxyTester _proxyTester;
 
     public event Action? SettingsSaved;
 
-    public SettingsWindow(IConfigurationService configService)
+    public SettingsWindow(IConfigurationService configService, IAutoStartService? autoStartService = null)
     {
         InitializeComponent();
 
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+        _autoStartService = autoStartService ?? new AutoStartService();
         _proxyTester = new ProxyTester();
 
         LoadValues();
@@ -42,6 +44,7 @@ public partial class SettingsWindow : Window
         TxtKey.Text = string.IsNullOrWhiteSpace(s.Hotkey.Key) ? "X" : s.Hotkey.Key;
 
         ChkSound.IsChecked = s.SoundFeedback;
+        ChkAutoStart.IsChecked = s.AutoStart;
         CmbLanguage.SelectedIndex = s.Language == "en" ? 1 : 0;
     }
 
@@ -110,6 +113,9 @@ public partial class SettingsWindow : Window
         s.Hotkey.Key = string.IsNullOrWhiteSpace(TxtKey.Text) ? "X" : TxtKey.Text.Trim().ToUpperInvariant();
 
         s.SoundFeedback = ChkSound.IsChecked == true;
+        bool autoStartEnabled = ChkAutoStart.IsChecked == true;
+        s.AutoStart = autoStartEnabled;
+        _autoStartService.SetAutoStart(autoStartEnabled);
         s.Language = CmbLanguage.SelectedIndex == 1 ? "en" : "ru";
 
         _configService.Save(s);

@@ -135,6 +135,7 @@
                     <StackPanel>
                         <TextBlock Text="{DynamicResource Loc_InterfaceAndSoundGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
                         <CheckBox x:Name="ChkSound" Content="{DynamicResource Loc_SoundFeedback}" Foreground="#FFFFFF" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="ChkAutoStart" Content="{DynamicResource Loc_AutoStart}" ToolTip="{DynamicResource Loc_AutoStartHelp}" Foreground="#FFFFFF" Margin="0,0,0,8"/>
                         
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{DynamicResource Loc_AppLanguage}" VerticalAlignment="Center" Margin="0,0,10,0"/>

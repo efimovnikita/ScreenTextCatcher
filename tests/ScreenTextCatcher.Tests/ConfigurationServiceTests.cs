@@ -40,6 +40,7 @@ public class ConfigurationServiceTests : IDisposable
         settings.Hotkey.Key.Should().Be("X");
         settings.SoundFeedback.Should().BeTrue();
         settings.Language.Should().Be("ru");
+        settings.AutoStart.Should().BeFalse();
     }
 
     [Fact]
@@ -66,7 +67,8 @@ public class ConfigurationServiceTests : IDisposable
                 Key = "S"
             },
             SoundFeedback = false,
-            Language = "en"
+            Language = "en",
+            AutoStart = true
         };
 
         service.Save(custom);
@@ -87,5 +89,6 @@ public class ConfigurationServiceTests : IDisposable
         loaded.Hotkey.Key.Should().Be("S");
         loaded.SoundFeedback.Should().BeFalse();
         loaded.Language.Should().Be("en");
+        loaded.AutoStart.Should().BeTrue();
     }
 }

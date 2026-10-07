@@ -18,6 +18,8 @@ public class TrayIconManager : IDisposable
     private readonly NotifyIcon _notifyIcon;
     private readonly ContextMenuStrip _contextMenu;
     private readonly IHistoryService _historyService;
+    private readonly IConfigurationService _configService;
+    private readonly IAutoStartService _autoStartService;
 
     private Icon? _idleIcon;
     private Icon? _busyIcon;
@@ -30,9 +32,14 @@ public class TrayIconManager : IDisposable
     public event Action? DashboardRequested;
     public event Action? ExitRequested;
 
-    public TrayIconManager(IHistoryService historyService)
+    public TrayIconManager(
+        IHistoryService historyService,
+        IConfigurationService? configService = null,
+        IAutoStartService? autoStartService = null)
     {
         _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
+        _configService = configService ?? new ConfigurationService();
+        _autoStartService = autoStartService ?? new AutoStartService();
 
         GenerateIcons();
 
@@ -48,7 +55,11 @@ public class TrayIconManager : IDisposable
         };
 
         _notifyIcon.DoubleClick += (s, e) => CaptureRequested?.Invoke();
-        _contextMenu.Opening += (s, e) => RebuildHistorySubmenu();
+        _contextMenu.Opening += (s, e) =>
+        {
+            RebuildHistorySubmenu();
+            UpdateAutoStartMenuItem();
+        };
 
         LocalizationManager.LanguageChanged += OnLanguageChanged;
     }
@@ -106,10 +117,36 @@ public class TrayIconManager : IDisposable
 
         _contextMenu.Items.Add(new ToolStripSeparator());
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TraySettings"), null, (s, e) => SettingsRequested?.Invoke()));
+
+        var autoStartItem = new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayAutoStart"))
+        {
+            Name = "AutoStartMenu",
+            CheckOnClick = true,
+            Checked = _autoStartService.IsAutoStartEnabled()
+        };
+        autoStartItem.Click += (s, e) =>
+        {
+            bool newStatus = autoStartItem.Checked;
+            _autoStartService.SetAutoStart(newStatus);
+            var settings = _configService.CurrentSettings;
+            settings.AutoStart = newStatus;
+            _configService.Save(settings);
+            Log.Information("Автозапуск изменен через меню трея: {Status}", newStatus);
+        };
+        _contextMenu.Items.Add(autoStartItem);
+
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayLogs"), null, (s, e) => LogsRequested?.Invoke()));
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayShowDashboard"), null, (s, e) => DashboardRequested?.Invoke()));
         _contextMenu.Items.Add(new ToolStripSeparator());
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayExit"), null, (s, e) => ExitRequested?.Invoke()));
+    }
+
+    private void UpdateAutoStartMenuItem()
+    {
+        if (_contextMenu.Items["AutoStartMenu"] is ToolStripMenuItem item)
+        {
+            item.Checked = _autoStartService.IsAutoStartEnabled();
+        }
     }
 
     private void RebuildHistorySubmenu()
