@@ -9,7 +9,7 @@
 - **UI Фреймворк**: WPF (Windows Presentation Foundation)
   - Полноэкранный прозрачный оверлей выбора области (`AllowsTransparency="True"`, `WindowStyle="None"`, 50% затемнение, Canvas с контрастной рамкой).
   - Компактные минималистичные окна: Настройки (Settings), Просмотр логов (Log Viewer), История (History).
-- **Системный трей**: Интеграция с треем Windows с контекстным меню и индикацией статуса.
+- **Системный трей и бренд-ассеты**: Интеграция с треем Windows с контекстным меню и индикацией статуса. Встроенные предкомпилированные многослойные ресурсы .ico (16×16 до 256×256 px) для исполняемого файла, окон WPF и состояний трея (Idle, Processing, Error) без процедурной GDI+ отрисовки.
 - **Глобальные хоткеи**: Win32 P/Invoke (`RegisterHotKey` / `UnregisterHotKey`) через `HwndSource`.
 - **Автозапуск Windows**: Win32 COM Interop (`IShellLinkW` / `IPersistFile`) для генерации ярлыков в `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` без сторонних зависимостей.
 
