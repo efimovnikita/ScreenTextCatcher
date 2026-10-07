@@ -84,4 +84,59 @@ public class EndToEndWorkflowTests : IDisposable
         historyService.Count().Should().Be(1);
         historyService.GetRecent().First().Text.Should().Be("Recognized Sample Text");
     }
+
+    [Fact]
+    public void FullWorkflow_ScreenshotWithAnnotations_SavesFile()
+    {
+        var tempFolder = Path.Combine(Path.GetTempPath(), "ScreenTextCatcher_E2E_Screenshots_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempFolder);
+
+        try
+        {
+            byte[]? pngBytes = null;
+            var thread = new Thread(() =>
+            {
+                var canvas = new System.Windows.Controls.Canvas
+                {
+                    Width = 300,
+                    Height = 200,
+                    ClipToBounds = true
+                };
+
+                var rect = Core.Helpers.AnnotationGeometryHelper.CreateRectangle(
+                    new System.Windows.Point(20, 20),
+                    new System.Windows.Point(100, 80));
+                var arrow = Core.Helpers.AnnotationGeometryHelper.CreateArrow(
+                    new System.Windows.Point(120, 30),
+                    new System.Windows.Point(250, 150));
+
+                canvas.Children.Add(rect);
+                canvas.Children.Add(arrow);
+
+                canvas.Measure(new System.Windows.Size(300, 200));
+                canvas.Arrange(new System.Windows.Rect(0, 0, 300, 200));
+
+                pngBytes = Core.Helpers.AnnotationExportHelper.RenderVisualToPng(canvas, 300, 200);
+
+                var screenshotService = new ScreenshotService();
+                var savedPath = screenshotService.SaveAndAccumulateClipboard(pngBytes, tempFolder, ClipboardDelimiter.NewLine);
+
+                File.Exists(savedPath).Should().BeTrue();
+                new FileInfo(savedPath).Length.Should().BeGreaterThan(0);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            pngBytes.Should().NotBeNull();
+            pngBytes!.Length.Should().BeGreaterThan(0);
+        }
+        finally
+        {
+            if (Directory.Exists(tempFolder))
+            {
+                try { Directory.Delete(tempFolder, true); } catch { }
+            }
+        }
+    }
 }

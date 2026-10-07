@@ -78,6 +78,11 @@ public static class LocalizationManager
 
         // Overlay Window
         ["Loc_OverlayHint"] = "Выделите область экрана рамкой. Нажмите Esc или кликните правой кнопкой мыши для отмены.",
+        ["Loc_AnnotateToolbarRect"] = "Рамка",
+        ["Loc_AnnotateToolbarArrow"] = "Стрелка",
+        ["Loc_AnnotateToolbarUndo"] = "Отменить действие (Ctrl+Z)",
+        ["Loc_AnnotateToolbarDone"] = "Сохранить (Enter)",
+        ["Loc_AnnotateToolbarCancel"] = "Отмена (Esc)",
 
         // App Mode & Screenshots
         ["Loc_ModeGroup"] = "Режим работы приложения",
@@ -188,6 +193,11 @@ public static class LocalizationManager
 
         // Overlay Window
         ["Loc_OverlayHint"] = "Select screen area with mouse. Press Esc or right-click to cancel.",
+        ["Loc_AnnotateToolbarRect"] = "Rectangle",
+        ["Loc_AnnotateToolbarArrow"] = "Arrow",
+        ["Loc_AnnotateToolbarUndo"] = "Undo (Ctrl+Z)",
+        ["Loc_AnnotateToolbarDone"] = "Save (Enter)",
+        ["Loc_AnnotateToolbarCancel"] = "Cancel (Esc)",
 
         // App Mode & Screenshots
         ["Loc_ModeGroup"] = "Application Mode",

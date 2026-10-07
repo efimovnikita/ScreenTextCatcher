@@ -78,4 +78,22 @@ public class LocalizationManagerTests
         var res2 = LocalizationManager.GetString("Unknown_Key_456", "DefaultValue");
         Assert.Equal("DefaultValue", res2);
     }
+
+    [Fact]
+    public void AnnotationToolbar_Keys_ExistInBothLanguages()
+    {
+        LocalizationManager.SetLanguage("ru");
+        Assert.Equal("Рамка", LocalizationManager.GetString("Loc_AnnotateToolbarRect"));
+        Assert.Equal("Стрелка", LocalizationManager.GetString("Loc_AnnotateToolbarArrow"));
+        Assert.Equal("Отменить действие (Ctrl+Z)", LocalizationManager.GetString("Loc_AnnotateToolbarUndo"));
+        Assert.Equal("Сохранить (Enter)", LocalizationManager.GetString("Loc_AnnotateToolbarDone"));
+        Assert.Equal("Отмена (Esc)", LocalizationManager.GetString("Loc_AnnotateToolbarCancel"));
+
+        LocalizationManager.SetLanguage("en");
+        Assert.Equal("Rectangle", LocalizationManager.GetString("Loc_AnnotateToolbarRect"));
+        Assert.Equal("Arrow", LocalizationManager.GetString("Loc_AnnotateToolbarArrow"));
+        Assert.Equal("Undo (Ctrl+Z)", LocalizationManager.GetString("Loc_AnnotateToolbarUndo"));
+        Assert.Equal("Save (Enter)", LocalizationManager.GetString("Loc_AnnotateToolbarDone"));
+        Assert.Equal("Cancel (Esc)", LocalizationManager.GetString("Loc_AnnotateToolbarCancel"));
+    }
 }

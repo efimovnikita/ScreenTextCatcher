@@ -224,7 +224,8 @@ public partial class MainWindow : Window
             await Task.Delay(200);
         }
 
-        var overlay = new Views.OverlayWindow();
+        var isScreenshot = _configService.CurrentSettings.Mode == AppMode.Screenshot;
+        var overlay = new Views.OverlayWindow(isScreenshot);
 
         overlay.Cancelled += () =>
         {
@@ -239,22 +240,17 @@ public partial class MainWindow : Window
             });
         };
 
-        overlay.AreaSelected += async rect =>
+        if (isScreenshot)
         {
-            try
+            overlay.ScreenshotReady += pngBytes =>
             {
-                _trayManager?.SetStatus(TrayStatus.Processing, LocalizationManager.GetString("Loc_TrayRecognizing"));
-                Log.Information("Захват области экрана в RAM: X={X}, Y={Y}, W={W}, H={H}", rect.X, rect.Y, rect.Width, rect.Height);
-
-                var pngBytes = _captureService.CaptureRegionToPngBytes(rect);
-                var s = _configService.CurrentSettings;
-
-                if (s.Mode == AppMode.Screenshot)
+                Dispatcher.Invoke(() =>
                 {
-                    Log.Information("Режим скриншотов: сохранение области на диск и аккумуляция в буфере обмена...");
-                    var folder = s.GetEffectiveScreenshotFolder();
                     try
                     {
+                        var s = _configService.CurrentSettings;
+                        Log.Information("Режим скриншотов: сохранение области с аннотациями на диск и аккумуляция в буфере обмена...");
+                        var folder = s.GetEffectiveScreenshotFolder();
                         var savedFilePath = _screenshotService.SaveAndAccumulateClipboard(pngBytes, folder, s.ClipboardDelimiter);
                         if (s.SoundFeedback)
                         {
@@ -272,8 +268,28 @@ public partial class MainWindow : Window
                             string.Format(LocalizationManager.GetString("Loc_NotificationScreenshotErrorMsg"), ex.Message),
                             ToolTipIcon.Error);
                     }
-                    return;
-                }
+                    finally
+                    {
+                        if (wasVisible)
+                        {
+                            ShowDashboard();
+                        }
+                        UpdateUiState();
+                    }
+                });
+            };
+        }
+        else
+        {
+            overlay.AreaSelected += async rect =>
+            {
+                try
+                {
+                    _trayManager?.SetStatus(TrayStatus.Processing, LocalizationManager.GetString("Loc_TrayRecognizing"));
+                    Log.Information("Захват области экрана в RAM: X={X}, Y={Y}, W={W}, H={H}", rect.X, rect.Y, rect.Width, rect.Height);
+
+                    var pngBytes = _captureService.CaptureRegionToPngBytes(rect);
+                    var s = _configService.CurrentSettings;
 
                 Log.Information("Снимок вырезан в RAM ({Bytes} байт). Запись на диск отсутствует.", pngBytes.Length);
 
@@ -336,6 +352,7 @@ public partial class MainWindow : Window
                 });
             }
         };
+        }
 
         overlay.Show();
     }
