@@ -27,6 +27,7 @@
   - `IScreenshotService` / `ScreenshotService` для сохранения фрагментов экрана в PNG с авто-разрешением коллизий имен файлов.
   - Подсистема аннотаций и экспорта: геометрические хелперы (`AnnotationGeometryHelper`, `ToolbarPositioningHelper`), динамический оверлей со стеком отмены (Undo), композитный рендеринг через `AnnotationExportHelper` (`RenderTargetBitmap` с сохранением DPI масштабирования).
   - Алгоритм строгой валидации содержимого буфера обмена и аккумуляции путей с поддержкой разделителей (`NewLine`, `Space`).
+  - Поддержка помещения графического изображения в буфер обмена Windows (форматы `BitmapSource` и `PNG` поток с механизмом retry) через метод `IScreenshotService.SaveAndCopyImageToClipboard`.
 
 ## Хранение данных и логирование
 - **Конфигурация**: `System.Text.Json` (`settings.json` в `%APPDATA%\ScreenTextCatcher\`).
