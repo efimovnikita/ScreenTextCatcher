@@ -9,7 +9,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Исправление позиционирования панели инструментов оверлея при выделении у границ экрана и мультимониторах**
+- [x] **Track: Исправление позиционирования панели инструментов оверлея при выделении у границ экрана и мультимониторах**
   *Link: [./tracks/overlay_toolbar_positioning_20261007/](./tracks/overlay_toolbar_positioning_20261007/)*
 
 
