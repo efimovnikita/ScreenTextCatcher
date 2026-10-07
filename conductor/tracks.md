@@ -9,6 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Режим аннотирования скриншотов (ScreenTextCatcher)**
+- [x] **Track: Режим аннотирования скриншотов (ScreenTextCatcher)**
   *Link: [./tracks/screenshot_annotation_20261007/](./tracks/screenshot_annotation_20261007/)*
 
