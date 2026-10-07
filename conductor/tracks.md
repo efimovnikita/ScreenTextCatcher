@@ -9,7 +9,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Режим создания скриншотов с аккумуляцией путей в буфере обмена**
+- [x] **Track: Режим создания скриншотов с аккумуляцией путей в буфере обмена**
   *Link: [./tracks/screenshot_mode_20261007/](./tracks/screenshot_mode_20261007/)*
 
 
