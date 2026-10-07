@@ -79,8 +79,25 @@ public static class LocalizationManager
         // Overlay Window
         ["Loc_OverlayHint"] = "Выделите область экрана рамкой. Нажмите Esc или кликните правой кнопкой мыши для отмены.",
 
+        // App Mode & Screenshots
+        ["Loc_ModeGroup"] = "Режим работы приложения",
+        ["Loc_ModeOcr"] = "Распознавание текста (Mistral OCR)",
+        ["Loc_ModeScreenshot"] = "Сохранение скриншотов в папку",
+        ["Loc_ScreenshotFolderLabel"] = "Папка для скриншотов:",
+        ["Loc_BtnBrowse"] = "Обзор...",
+        ["Loc_BtnOpenScreenshotFolder"] = "📂 Открыть папку скриншотов",
+        ["Loc_LogScreenshotSaved"] = "Скриншот сохранён: {0}",
+        ["Loc_NotificationScreenshotErrorTitle"] = "Ошибка сохранения скриншота",
+        ["Loc_NotificationScreenshotErrorMsg"] = "Не удалось сохранить скриншот: {0}",
+        ["Loc_ClipboardDelimiterLabel"] = "Разделитель путей в буфере:",
+        ["Loc_DelimiterNewLine"] = "Перенос строки (\\r\\n)",
+        ["Loc_DelimiterSpace"] = "Пробел (' ')",
+
         // Tray Menu & Notifications
         ["Loc_TrayCapture"] = "✂ Захват текста экрана (Win+Shift+X)",
+        ["Loc_TrayCaptureScreenshot"] = "✂ Сделать скриншот (Win+Shift+X)",
+        ["Loc_TrayModeOcr"] = "Режим: Распознавание текста (OCR)",
+        ["Loc_TrayModeScreenshot"] = "Режим: Сохранение скриншотов",
         ["Loc_TrayRecent"] = "📋 Последние распознавания",
         ["Loc_TrayAllHistory"] = "📋 Вся история (100 записей)...",
         ["Loc_TraySettings"] = "⚙ Настройки...",
@@ -172,8 +189,25 @@ public static class LocalizationManager
         // Overlay Window
         ["Loc_OverlayHint"] = "Select screen area with mouse. Press Esc or right-click to cancel.",
 
+        // App Mode & Screenshots
+        ["Loc_ModeGroup"] = "Application Mode",
+        ["Loc_ModeOcr"] = "Text Recognition (Mistral OCR)",
+        ["Loc_ModeScreenshot"] = "Save Screenshots to Folder",
+        ["Loc_ScreenshotFolderLabel"] = "Screenshots folder:",
+        ["Loc_BtnBrowse"] = "Browse...",
+        ["Loc_BtnOpenScreenshotFolder"] = "📂 Open Screenshots Folder",
+        ["Loc_LogScreenshotSaved"] = "Screenshot saved: {0}",
+        ["Loc_NotificationScreenshotErrorTitle"] = "Screenshot Save Error",
+        ["Loc_NotificationScreenshotErrorMsg"] = "Failed to save screenshot: {0}",
+        ["Loc_ClipboardDelimiterLabel"] = "Clipboard path delimiter:",
+        ["Loc_DelimiterNewLine"] = "New line (\\r\\n)",
+        ["Loc_DelimiterSpace"] = "Space (' ')",
+
         // Tray Menu & Notifications
         ["Loc_TrayCapture"] = "✂ Capture Screen Text (Win+Shift+X)",
+        ["Loc_TrayCaptureScreenshot"] = "✂ Take Screenshot (Win+Shift+X)",
+        ["Loc_TrayModeOcr"] = "Mode: Text Recognition (OCR)",
+        ["Loc_TrayModeScreenshot"] = "Mode: Save Screenshots",
         ["Loc_TrayRecent"] = "📋 Recent Recognitions",
         ["Loc_TrayAllHistory"] = "📋 Full History (100 items)...",
         ["Loc_TraySettings"] = "⚙ Settings...",

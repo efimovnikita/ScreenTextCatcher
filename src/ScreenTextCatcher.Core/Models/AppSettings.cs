@@ -28,10 +28,26 @@ public class HotkeySettings
 
 public class AppSettings
 {
+    public AppMode Mode { get; set; } = AppMode.Ocr;
+    public string ScreenshotFolder { get; set; } = string.Empty;
+    public ClipboardDelimiter ClipboardDelimiter { get; set; } = ClipboardDelimiter.NewLine;
     public string MistralApiKey { get; set; } = string.Empty;
     public ProxySettings Proxy { get; set; } = new();
     public HotkeySettings Hotkey { get; set; } = new();
     public bool SoundFeedback { get; set; } = true;
     public string Language { get; set; } = "ru";
     public bool AutoStart { get; set; } = false;
+
+    public string GetEffectiveScreenshotFolder()
+    {
+        if (!string.IsNullOrWhiteSpace(ScreenshotFolder))
+        {
+            return ScreenshotFolder;
+        }
+
+        return System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+            "ScreenTextCatcher");
+    }
 }
+

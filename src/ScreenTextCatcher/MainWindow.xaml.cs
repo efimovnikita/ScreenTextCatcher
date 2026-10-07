@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     private readonly IHistoryService _historyService;
     private readonly ScreenCaptureService _captureService;
     private readonly IAutoStartService _autoStartService;
+    private readonly IScreenshotService _screenshotService;
 
     private TrayIconManager? _trayManager;
     private HotkeyManager? _hotkeyManager;
@@ -34,6 +35,7 @@ public partial class MainWindow : Window
         _historyService = new HistoryService();
         _captureService = new ScreenCaptureService();
         _autoStartService = new AutoStartService();
+        _screenshotService = new ScreenshotService();
 
         // Synchronize autostart shortcut if enabled in settings
         if (_configService.CurrentSettings.AutoStart && !_autoStartService.IsAutoStartEnabled())
@@ -61,6 +63,11 @@ public partial class MainWindow : Window
         _trayManager.LogsRequested += () => Dispatcher.Invoke(OpenLogsDialog);
         _trayManager.DashboardRequested += () => Dispatcher.Invoke(ShowDashboard);
         _trayManager.ExitRequested += () => Dispatcher.Invoke(ExitApplication);
+        _trayManager.ModeChanged += mode => Dispatcher.Invoke(() =>
+        {
+            SyncModeRadioButtons(mode);
+            UpdateUiState();
+        });
 
         Closing += OnMainWindowClosing;
 
@@ -113,6 +120,7 @@ public partial class MainWindow : Window
     private void LoadSettingsToInputs()
     {
         var s = _configService.CurrentSettings;
+        SyncModeRadioButtons(s.Mode);
         TxtApiKey.Text = s.MistralApiKey;
         ChkProxyEnabled.IsChecked = s.Proxy.Enabled;
         CmbProxyType.SelectedIndex = (int)s.Proxy.Type;
@@ -122,12 +130,59 @@ public partial class MainWindow : Window
         TxtProxyPassword.Password = s.Proxy.Password;
     }
 
+    private void SyncModeRadioButtons(AppMode mode)
+    {
+        if (mode == AppMode.Screenshot)
+        {
+            RbDashboardModeScreenshot.IsChecked = true;
+        }
+        else
+        {
+            RbDashboardModeOcr.IsChecked = true;
+        }
+    }
+
+    private void OnDashboardModeChanged(object sender, RoutedEventArgs e)
+    {
+        if (_trayManager == null || _configService == null) return;
+        var newMode = RbDashboardModeScreenshot.IsChecked == true ? AppMode.Screenshot : AppMode.Ocr;
+        _trayManager.SetActiveMode(newMode);
+        UpdateUiState();
+    }
+
+    private void OnOpenScreenshotsFolderClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var folder = _configService.CurrentSettings.GetEffectiveScreenshotFolder();
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = folder,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(ex.Message, LocalizationManager.GetString("Loc_NotificationScreenshotErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
     private void UpdateUiState()
     {
         var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScreenTextCatcher");
         TxtHistoryPath.Text = Path.Combine(appData, "history.db");
         var format = LocalizationManager.GetString("Loc_HistoryCountFormat");
         TxtHistoryCount.Text = string.Format(format, _historyService.Count());
+
+        var isScreenshot = _configService.CurrentSettings.Mode == AppMode.Screenshot;
+        if (BtnCapture != null)
+        {
+            BtnCapture.Content = LocalizationManager.GetString(isScreenshot ? "Loc_TrayCaptureScreenshot" : "Loc_BtnCapture");
+        }
     }
 
     private void OnSaveConfigClick(object sender, RoutedEventArgs e)
@@ -192,9 +247,36 @@ public partial class MainWindow : Window
                 Log.Information("Захват области экрана в RAM: X={X}, Y={Y}, W={W}, H={H}", rect.X, rect.Y, rect.Width, rect.Height);
 
                 var pngBytes = _captureService.CaptureRegionToPngBytes(rect);
+                var s = _configService.CurrentSettings;
+
+                if (s.Mode == AppMode.Screenshot)
+                {
+                    Log.Information("Режим скриншотов: сохранение области на диск и аккумуляция в буфере обмена...");
+                    var folder = s.GetEffectiveScreenshotFolder();
+                    try
+                    {
+                        var savedFilePath = _screenshotService.SaveAndAccumulateClipboard(pngBytes, folder, s.ClipboardDelimiter);
+                        if (s.SoundFeedback)
+                        {
+                            System.Media.SystemSounds.Asterisk.Play();
+                        }
+                        _trayManager?.SetStatus(TrayStatus.Idle);
+                        Log.Information(string.Format(LocalizationManager.GetString("Loc_LogScreenshotSaved"), savedFilePath));
+                    }
+                    catch (Exception ex)
+                    {
+                        _trayManager?.SetStatus(TrayStatus.Error, LocalizationManager.GetString("Loc_NotificationScreenshotErrorTitle"));
+                        Log.Error(ex, "Ошибка сохранения скриншота: {Message}", ex.Message);
+                        _trayManager?.ShowNotification(
+                            LocalizationManager.GetString("Loc_NotificationScreenshotErrorTitle"),
+                            string.Format(LocalizationManager.GetString("Loc_NotificationScreenshotErrorMsg"), ex.Message),
+                            ToolTipIcon.Error);
+                    }
+                    return;
+                }
+
                 Log.Information("Снимок вырезан в RAM ({Bytes} байт). Запись на диск отсутствует.", pngBytes.Length);
 
-                var s = _configService.CurrentSettings;
                 if (string.IsNullOrWhiteSpace(s.MistralApiKey))
                 {
                     _trayManager?.SetStatus(TrayStatus.Error, LocalizationManager.GetString("Loc_TrayNoApiKey"));
@@ -402,6 +484,7 @@ public partial class MainWindow : Window
             _hotkeyManager?.Register(s.Hotkey, () => Dispatcher.Invoke(StartOcrCapture));
             LoadSettingsToInputs();
             UpdateUiState();
+            _trayManager?.UpdateModeMenuItems();
             Log.Information("Настройки обновлены через окно настроек.");
         };
 

@@ -31,6 +31,7 @@ public class TrayIconManager : IDisposable
     public event Action? LogsRequested;
     public event Action? DashboardRequested;
     public event Action? ExitRequested;
+    public event Action<ScreenTextCatcher.Core.Models.AppMode>? ModeChanged;
 
     public TrayIconManager(
         IHistoryService historyService,
@@ -59,6 +60,7 @@ public class TrayIconManager : IDisposable
         {
             RebuildHistorySubmenu();
             UpdateAutoStartMenuItem();
+            UpdateModeMenuItems();
         };
 
         LocalizationManager.LanguageChanged += OnLanguageChanged;
@@ -103,11 +105,34 @@ public class TrayIconManager : IDisposable
     {
         _contextMenu.Items.Clear();
 
-        var captureItem = new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayCapture"), null, (s, e) => CaptureRequested?.Invoke())
+        var isScreenshot = _configService.CurrentSettings.Mode == ScreenTextCatcher.Core.Models.AppMode.Screenshot;
+        var captureItem = new ToolStripMenuItem(
+            LocalizationManager.GetString(isScreenshot ? "Loc_TrayCaptureScreenshot" : "Loc_TrayCapture"),
+            null,
+            (s, e) => CaptureRequested?.Invoke())
         {
+            Name = "CaptureItem",
             Font = new Font(_contextMenu.Font, FontStyle.Bold)
         };
         _contextMenu.Items.Add(captureItem);
+        _contextMenu.Items.Add(new ToolStripSeparator());
+
+        var ocrModeItem = new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayModeOcr"))
+        {
+            Name = "ModeOcrItem",
+            Checked = !isScreenshot
+        };
+        ocrModeItem.Click += (s, e) => SwitchMode(ScreenTextCatcher.Core.Models.AppMode.Ocr);
+
+        var screenshotModeItem = new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayModeScreenshot"))
+        {
+            Name = "ModeScreenshotItem",
+            Checked = isScreenshot
+        };
+        screenshotModeItem.Click += (s, e) => SwitchMode(ScreenTextCatcher.Core.Models.AppMode.Screenshot);
+
+        _contextMenu.Items.Add(ocrModeItem);
+        _contextMenu.Items.Add(screenshotModeItem);
         _contextMenu.Items.Add(new ToolStripSeparator());
 
         var historyMenu = new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayRecent"));
@@ -139,6 +164,41 @@ public class TrayIconManager : IDisposable
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayShowDashboard"), null, (s, e) => DashboardRequested?.Invoke()));
         _contextMenu.Items.Add(new ToolStripSeparator());
         _contextMenu.Items.Add(new ToolStripMenuItem(LocalizationManager.GetString("Loc_TrayExit"), null, (s, e) => ExitRequested?.Invoke()));
+    }
+
+    public void SetActiveMode(ScreenTextCatcher.Core.Models.AppMode mode)
+    {
+        var settings = _configService.CurrentSettings;
+        if (settings.Mode != mode)
+        {
+            settings.Mode = mode;
+            _configService.Save(settings);
+        }
+        UpdateModeMenuItems();
+        ModeChanged?.Invoke(mode);
+    }
+
+    private void SwitchMode(ScreenTextCatcher.Core.Models.AppMode mode)
+    {
+        SetActiveMode(mode);
+        Log.Information("Режим работы переключен через меню трея: {Mode}", mode);
+    }
+
+    public void UpdateModeMenuItems()
+    {
+        var isScreenshot = _configService.CurrentSettings.Mode == ScreenTextCatcher.Core.Models.AppMode.Screenshot;
+        if (_contextMenu.Items["ModeOcrItem"] is ToolStripMenuItem ocrItem)
+        {
+            ocrItem.Checked = !isScreenshot;
+        }
+        if (_contextMenu.Items["ModeScreenshotItem"] is ToolStripMenuItem scItem)
+        {
+            scItem.Checked = isScreenshot;
+        }
+        if (_contextMenu.Items["CaptureItem"] is ToolStripMenuItem captureItem)
+        {
+            captureItem.Text = LocalizationManager.GetString(isScreenshot ? "Loc_TrayCaptureScreenshot" : "Loc_TrayCapture");
+        }
     }
 
     private void UpdateAutoStartMenuItem()

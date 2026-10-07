@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using ScreenTextCatcher.Core.Models;
@@ -28,6 +30,13 @@ public partial class SettingsWindow : Window
     private void LoadValues()
     {
         var s = _configService.CurrentSettings;
+
+        RbModeOcr.IsChecked = s.Mode == AppMode.Ocr;
+        RbModeScreenshot.IsChecked = s.Mode == AppMode.Screenshot;
+        TxtScreenshotFolder.Text = string.IsNullOrWhiteSpace(s.ScreenshotFolder)
+            ? s.GetEffectiveScreenshotFolder()
+            : s.ScreenshotFolder;
+        CmbClipboardDelimiter.SelectedIndex = s.ClipboardDelimiter == ClipboardDelimiter.Space ? 1 : 0;
 
         TxtApiKey.Text = s.MistralApiKey;
         ChkProxyEnabled.IsChecked = s.Proxy.Enabled;
@@ -89,9 +98,55 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void OnBrowseFolderClick(object sender, RoutedEventArgs e)
+    {
+        var current = string.IsNullOrWhiteSpace(TxtScreenshotFolder.Text)
+            ? _configService.CurrentSettings.GetEffectiveScreenshotFolder()
+            : TxtScreenshotFolder.Text.Trim();
+
+        var dialog = new Microsoft.Win32.OpenFolderDialog
+        {
+            InitialDirectory = Directory.Exists(current) ? current : Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            TxtScreenshotFolder.Text = dialog.FolderName;
+        }
+    }
+
+    private void OnOpenFolderClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var folder = string.IsNullOrWhiteSpace(TxtScreenshotFolder.Text)
+                ? _configService.CurrentSettings.GetEffectiveScreenshotFolder()
+                : TxtScreenshotFolder.Text.Trim();
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = folder,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(ex.Message, LocalizationManager.GetString("Loc_NotificationScreenshotErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
     private void OnSaveClick(object sender, RoutedEventArgs e)
     {
         var s = _configService.CurrentSettings;
+
+        s.Mode = RbModeScreenshot.IsChecked == true ? AppMode.Screenshot : AppMode.Ocr;
+        s.ScreenshotFolder = TxtScreenshotFolder.Text.Trim();
+        s.ClipboardDelimiter = CmbClipboardDelimiter.SelectedIndex == 1 ? ClipboardDelimiter.Space : ClipboardDelimiter.NewLine;
 
         s.MistralApiKey = TxtApiKey.Text.Trim();
         s.Proxy.Enabled = ChkProxyEnabled.IsChecked == true;

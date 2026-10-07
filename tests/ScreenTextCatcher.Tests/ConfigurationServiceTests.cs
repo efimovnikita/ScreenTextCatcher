@@ -41,6 +41,10 @@ public class ConfigurationServiceTests : IDisposable
         settings.SoundFeedback.Should().BeTrue();
         settings.Language.Should().Be("ru");
         settings.AutoStart.Should().BeFalse();
+        settings.Mode.Should().Be(AppMode.Ocr);
+        settings.ScreenshotFolder.Should().BeEmpty();
+        settings.ClipboardDelimiter.Should().Be(ClipboardDelimiter.NewLine);
+        settings.GetEffectiveScreenshotFolder().Should().Contain("ScreenTextCatcher");
     }
 
     [Fact]
@@ -50,6 +54,9 @@ public class ConfigurationServiceTests : IDisposable
         var custom = new AppSettings
         {
             MistralApiKey = "test_api_key_12345",
+            Mode = AppMode.Screenshot,
+            ScreenshotFolder = @"C:\CustomScreenshots",
+            ClipboardDelimiter = ClipboardDelimiter.Space,
             Proxy = new ProxySettings
             {
                 Enabled = true,
@@ -77,6 +84,10 @@ public class ConfigurationServiceTests : IDisposable
 
         var loaded = service.Load();
         loaded.MistralApiKey.Should().Be("test_api_key_12345");
+        loaded.Mode.Should().Be(AppMode.Screenshot);
+        loaded.ScreenshotFolder.Should().Be(@"C:\CustomScreenshots");
+        loaded.ClipboardDelimiter.Should().Be(ClipboardDelimiter.Space);
+        loaded.GetEffectiveScreenshotFolder().Should().Be(@"C:\CustomScreenshots");
         loaded.Proxy.Enabled.Should().BeTrue();
         loaded.Proxy.Type.Should().Be(ProxyType.Socks5);
         loaded.Proxy.Host.Should().Be("10.0.0.1");
