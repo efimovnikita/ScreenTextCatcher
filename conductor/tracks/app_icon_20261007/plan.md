@@ -44,8 +44,8 @@
     - [x] Проверить отображение иконки исполняемого файла `ScreenTextCatcher.exe` в Проводнике и на панели задач
     - [x] Проверить отображение иконки в заголовках окон `MainWindow`, `SettingsWindow`, `HistoryWindow`, `LogViewerWindow`
     - [x] Проверить отображение и смену иконок в системном трее (Idle, Processing, Error)
-- [~] Task: Фиксация коммита трека и создание релиза на GitHub
-    - [~] Закоммитить изменения трека с подробной сводкой согласно правилам `workflow.md`
-    - [ ] Создать git-тег `v1.2.2` и отправить в репозиторий GitHub (`git push origin v1.2.2`)
-    - [ ] Верифицировать успешное выполнение GitHub Actions Release workflow и публикацию архива `ScreenTextCatcher-win-x64.zip`
-- [ ] Task: Conductor - User Manual Verification 'Фаза 4: Комплексная верификация и релиз на GitHub' (Protocol in workflow.md)
+- [x] Task: Фиксация коммита трека и создание релиза на GitHub
+    - [x] Закоммитить изменения трека с подробной сводкой согласно правилам `workflow.md`
+    - [x] Создать git-тег `v1.2.2` и отправить в репозиторий GitHub (`git push origin v1.2.2`)
+    - [x] Верифицировать успешное выполнение GitHub Actions Release workflow и публикацию архива `ScreenTextCatcher-win-x64.zip`
+- [x] Task: Conductor - User Manual Verification 'Фаза 4: Комплексная верификация и релиз на GitHub' (Protocol in workflow.md)

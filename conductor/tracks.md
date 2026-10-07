@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Внедрение бренд-комплекта иконок приложения и системного трея (Mistral AI стиль)**
+- [x] **Track: Внедрение бренд-комплекта иконок приложения и системного трея (Mistral AI стиль)**
   *Link: [./tracks/app_icon_20261007/](./tracks/app_icon_20261007/)*
