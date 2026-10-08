@@ -33,8 +33,8 @@
 - [x] Task: Подготовка коммита изменений трека
     - [x] Обновить версию в `ScreenTextCatcher.csproj` и `ScreenTextCatcher.Core.csproj` до `1.2.3`
     - [x] Закоммитить изменения трека согласно протоколу коммитов с подробной сводкой
-- [~] Task: Создание git-тега v1.2.3 и публикация релиза на GitHub
-    - [ ] Создать git-тег `v1.2.3` с описанием релиза
-    - [ ] Отправить тег на GitHub (`git push origin v1.2.3`)
-    - [ ] Дождаться завершения GitHub Actions Release workflow и верифицировать создание дистрибутива `ScreenTextCatcher-win-x64.zip`
-- [ ] Task: Conductor - User Manual Verification 'Фаза 4: Выпуск релиза на GitHub' (Protocol in workflow.md)
+- [x] Task: Создание git-тега v1.2.3 и публикация релиза на GitHub
+    - [x] Создать git-тег `v1.2.3` с описанием релиза
+    - [x] Отправить тег на GitHub (`git push origin v1.2.3`)
+    - [x] Дождаться завершения GitHub Actions Release workflow и верифицировать создание дистрибутива `ScreenTextCatcher-win-x64.zip`
+- [x] Task: Conductor - User Manual Verification 'Фаза 4: Выпуск релиза на GitHub' (Protocol in workflow.md)
