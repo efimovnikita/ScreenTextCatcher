@@ -25,6 +25,7 @@ public class LocalizationManagerTests
         Assert.Equal("Разделитель путей в буфере:", LocalizationManager.GetString("Loc_ClipboardDelimiterLabel"));
         Assert.Equal("Перенос строки (\\r\\n)", LocalizationManager.GetString("Loc_DelimiterNewLine"));
         Assert.Equal("Пробел (' ')", LocalizationManager.GetString("Loc_DelimiterSpace"));
+        Assert.Equal("Система", LocalizationManager.GetString("Loc_SystemGroup"));
     }
 
     [Fact]
@@ -48,6 +49,7 @@ public class LocalizationManagerTests
         Assert.Equal("Clipboard path delimiter:", LocalizationManager.GetString("Loc_ClipboardDelimiterLabel"));
         Assert.Equal("New line (\\r\\n)", LocalizationManager.GetString("Loc_DelimiterNewLine"));
         Assert.Equal("Space (' ')", LocalizationManager.GetString("Loc_DelimiterSpace"));
+        Assert.Equal("System", LocalizationManager.GetString("Loc_SystemGroup"));
     }
 
     [Fact]

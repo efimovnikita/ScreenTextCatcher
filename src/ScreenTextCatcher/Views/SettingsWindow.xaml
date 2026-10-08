@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource Loc_SettingsTitle}" 
         Icon="pack://application:,,,/Assets/app.ico"
-        Height="680" Width="540"
+        Height="740" Width="540"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#1E1E1E">
@@ -274,7 +274,6 @@
                     <StackPanel>
                         <TextBlock Text="{DynamicResource Loc_InterfaceAndSoundGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
                         <CheckBox x:Name="ChkSound" Content="{DynamicResource Loc_SoundFeedback}" Foreground="#FFFFFF" Margin="0,0,0,8"/>
-                        <CheckBox x:Name="ChkAutoStart" Content="{DynamicResource Loc_AutoStart}" ToolTip="{DynamicResource Loc_AutoStartHelp}" Foreground="#FFFFFF" Margin="0,0,0,8"/>
                         
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{DynamicResource Loc_AppLanguage}" VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -283,6 +282,14 @@
                                 <ComboBoxItem Content="English"/>
                             </ComboBox>
                         </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- System Section -->
+                <Border Background="#252526" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Loc_SystemGroup}" FontWeight="Bold" Foreground="#DCDCAA" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="ChkAutoStart" Content="{DynamicResource Loc_AutoStart}" ToolTip="{DynamicResource Loc_AutoStartHelp}" Foreground="#FFFFFF"/>
                     </StackPanel>
                 </Border>
 
