@@ -1,0 +1,8 @@
+{
+  "track_id": "settings_system_section_20261008",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-10-08T14:03:00Z",
+  "updated_at": "2026-10-08T14:03:00Z",
+  "description": "Реорганизация настроек: вынос опции «Запускать при старте Windows» в отдельную секцию «Система»"
+}
