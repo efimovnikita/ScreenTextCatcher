@@ -91,6 +91,6 @@ public class AssetAndIconTests
         var content = File.ReadAllText(csprojPath);
 
         Assert.Contains("<ApplicationIcon>Assets\\app.ico</ApplicationIcon>", content);
-        Assert.Contains("<Version>1.2.3</Version>", content);
+        Assert.Contains("<Version>1.3.0</Version>", content);
     }
 }
