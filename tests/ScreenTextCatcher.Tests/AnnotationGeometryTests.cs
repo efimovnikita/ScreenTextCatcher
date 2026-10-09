@@ -139,4 +139,78 @@ public class AnnotationGeometryTests {
       Assert.Equal(2, geom.Figures.Count);
     });
   }
+
+  [Fact]
+  public void CreateLine_SetsCorrectStyleAndCoordinates() {
+    RunInSta(() => {
+      var p1 = new Point(10, 20);
+      var p2 = new Point(80, 90);
+
+      var line = AnnotationGeometryHelper.CreateLine(p1, p2);
+
+      Assert.NotNull(line);
+      Assert.Equal(AnnotationGeometryHelper.StrokeThickness, line.StrokeThickness);
+      Assert.True(line.Stroke is SolidColorBrush brush && brush.Color == AnnotationGeometryHelper.AnnotationColor);
+      Assert.Equal(PenLineCap.Round, line.StrokeStartLineCap);
+      Assert.Equal(PenLineCap.Round, line.StrokeEndLineCap);
+      Assert.Equal(10.0, line.X1);
+      Assert.Equal(20.0, line.Y1);
+      Assert.Equal(80.0, line.X2);
+      Assert.Equal(90.0, line.Y2);
+    });
+  }
+
+  [Fact]
+  public void UpdateLine_UpdatesCoordinates() {
+    RunInSta(() => {
+      var p1 = new Point(10, 20);
+      var p2 = new Point(50, 60);
+
+      var line = AnnotationGeometryHelper.CreateLine(p1, p2);
+      var newEnd = new Point(100, 150);
+      AnnotationGeometryHelper.UpdateLine(line, p1, newEnd);
+
+      Assert.Equal(10.0, line.X1);
+      Assert.Equal(20.0, line.Y1);
+      Assert.Equal(100.0, line.X2);
+      Assert.Equal(150.0, line.Y2);
+    });
+  }
+
+  [Fact]
+  public void SnapToAngle_SnapsToExpected45DegreeMultiples() {
+    var start = new Point(100, 100);
+
+    // Identical start and current returns start
+    var same = AnnotationGeometryHelper.SnapToAngle(start, start);
+    Assert.Equal(start.X, same.X);
+    Assert.Equal(start.Y, same.Y);
+
+    // ~5 degrees (near 0 deg / horizontal right): dx = 100, dy = 10
+    var near0 = AnnotationGeometryHelper.SnapToAngle(start, new Point(200, 110));
+    Assert.Equal(start.Y, near0.Y, precision: 3);
+    Assert.True(near0.X > start.X);
+
+    // ~40 degrees (near 45 deg diagonal down-right): dx = 100, dy = 90
+    var near45 = AnnotationGeometryHelper.SnapToAngle(start, new Point(200, 190));
+    var dist45 = Math.Sqrt(Math.Pow(near45.X - start.X, 2) + Math.Pow(near45.Y - start.Y, 2));
+    var origDist45 = Math.Sqrt(100 * 100 + 90 * 90);
+    Assert.Equal(origDist45, dist45, precision: 3);
+    Assert.Equal(near45.X - start.X, near45.Y - start.Y, precision: 3);
+
+    // ~85 degrees (near 90 deg vertical down): dx = 10, dy = 100
+    var near90 = AnnotationGeometryHelper.SnapToAngle(start, new Point(110, 200));
+    Assert.Equal(start.X, near90.X, precision: 3);
+    Assert.True(near90.Y > start.Y);
+
+    // ~175 degrees (near 180 deg horizontal left): dx = -100, dy = 10
+    var near180 = AnnotationGeometryHelper.SnapToAngle(start, new Point(0, 110));
+    Assert.Equal(start.Y, near180.Y, precision: 3);
+    Assert.True(near180.X < start.X);
+
+    // ~275 degrees (near 270 deg vertical up): dx = 10, dy = -100
+    var near270 = AnnotationGeometryHelper.SnapToAngle(start, new Point(110, 0));
+    Assert.Equal(start.X, near270.X, precision: 3);
+    Assert.True(near270.Y < start.Y);
+  }
 }

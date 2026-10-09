@@ -153,6 +153,14 @@
                     <TextBlock Text="➔" FontSize="16" FontWeight="Bold"/>
                 </Button>
 
+                <!-- Line Tool -->
+                <Button x:Name="BtnToolLine" 
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        ToolTip="{DynamicResource Loc_AnnotateToolbarLine}"
+                        Click="OnToolLineClick">
+                    <TextBlock Text="―" FontSize="16" FontWeight="Bold"/>
+                </Button>
+
                 <Rectangle Width="1" Height="20" Fill="#444444" Margin="6,2"/>
 
                 <!-- Undo Button -->

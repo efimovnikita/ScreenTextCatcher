@@ -111,4 +111,49 @@ public static class AnnotationGeometryHelper {
 
     arrowPath.Data = geom;
   }
+
+  public static Point SnapToAngle(Point start, Point current, double stepDegrees = 45.0) {
+    double dx = current.X - start.X;
+    double dy = current.Y - start.Y;
+    double distance = Math.Sqrt(dx * dx + dy * dy);
+
+    if (distance < 1e-6) {
+      return start;
+    }
+
+    double currentAngleRad = Math.Atan2(dy, dx);
+    double currentAngleDeg = currentAngleRad * 180.0 / Math.PI;
+
+    double snappedAngleDeg = Math.Round(currentAngleDeg / stepDegrees) * stepDegrees;
+    double snappedAngleRad = snappedAngleDeg * Math.PI / 180.0;
+
+    double newX = start.X + distance * Math.Cos(snappedAngleRad);
+    double newY = start.Y + distance * Math.Sin(snappedAngleRad);
+
+    return new Point(newX, newY);
+  }
+
+  public static Line CreateLine(Point start, Point end) {
+    var brush = new SolidColorBrush(AnnotationColor);
+    if (brush.CanFreeze) {
+      brush.Freeze();
+    }
+
+    var line = new Line {
+      Stroke = brush,
+      StrokeThickness = StrokeThickness,
+      StrokeStartLineCap = PenLineCap.Round,
+      StrokeEndLineCap = PenLineCap.Round
+    };
+
+    UpdateLine(line, start, end);
+    return line;
+  }
+
+  public static void UpdateLine(Line line, Point start, Point end) {
+    line.X1 = start.X;
+    line.Y1 = start.Y;
+    line.X2 = end.X;
+    line.Y2 = end.Y;
+  }
 }

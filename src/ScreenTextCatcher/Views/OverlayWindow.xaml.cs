@@ -29,7 +29,8 @@ public partial class OverlayWindow : Window {
   private enum AnnotationTool {
     None,
     Rectangle,
-    Arrow
+    Arrow,
+    Line
   }
 
   private static System.Windows.Input.Cursor? _cachedRedCrosshair;
@@ -162,6 +163,8 @@ public partial class OverlayWindow : Window {
           _currentDrawingShape = AnnotationGeometryHelper.CreateRectangle(_drawingStartPoint, _drawingStartPoint);
         } else if (_activeTool == AnnotationTool.Arrow) {
           _currentDrawingShape = AnnotationGeometryHelper.CreateArrow(_drawingStartPoint, _drawingStartPoint);
+        } else if (_activeTool == AnnotationTool.Line) {
+          _currentDrawingShape = AnnotationGeometryHelper.CreateLine(_drawingStartPoint, _drawingStartPoint);
         }
 
         if (_currentDrawingShape != null) {
@@ -202,11 +205,20 @@ public partial class OverlayWindow : Window {
       Canvas.SetTop(DimensionBadge, Math.Max(10, y - 26));
     } else if (_state == OverlayState.Annotating && _isDrawing && _currentDrawingShape != null) {
       var currentPoint = e.GetPosition(AnnotationCanvas);
+      bool isShiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
 
       if (_currentDrawingShape is System.Windows.Shapes.Rectangle rect) {
         AnnotationGeometryHelper.UpdateRectangle(rect, _drawingStartPoint, currentPoint);
       } else if (_currentDrawingShape is System.Windows.Shapes.Path arrow) {
-        AnnotationGeometryHelper.UpdateArrow(arrow, _drawingStartPoint, currentPoint);
+        var targetPoint = isShiftPressed
+            ? AnnotationGeometryHelper.SnapToAngle(_drawingStartPoint, currentPoint)
+            : currentPoint;
+        AnnotationGeometryHelper.UpdateArrow(arrow, _drawingStartPoint, targetPoint);
+      } else if (_currentDrawingShape is System.Windows.Shapes.Line line) {
+        var targetPoint = isShiftPressed
+            ? AnnotationGeometryHelper.SnapToAngle(_drawingStartPoint, currentPoint)
+            : currentPoint;
+        AnnotationGeometryHelper.UpdateLine(line, _drawingStartPoint, targetPoint);
       }
     }
   }
@@ -298,27 +310,32 @@ public partial class OverlayWindow : Window {
       // Default state: no active tool, arrow cursor
       SetActiveTool(AnnotationTool.None);
       BtnUndo.IsEnabled = false;
-    } else if (_state == OverlayState.Annotating && _isDrawing && _currentDrawingShape != null) {
+    } else if (_state == OverlayState.Annotating && _isDrawing) {
       _isDrawing = false;
       OverlayCanvas.ReleaseMouseCapture();
 
-      bool isTooSmall = false;
-      if (_currentDrawingShape is System.Windows.Shapes.Rectangle r) {
-        isTooSmall = r.Width < 2 && r.Height < 2;
-      } else if (_currentDrawingShape is System.Windows.Shapes.Path) {
-        var endP = e.GetPosition(AnnotationCanvas);
-        var dist = Math.Sqrt(Math.Pow(endP.X - _drawingStartPoint.X, 2) + Math.Pow(endP.Y - _drawingStartPoint.Y, 2));
-        isTooSmall = dist < 3;
-      }
+      if (_currentDrawingShape != null) {
+        bool isTooSmall = false;
+        if (_currentDrawingShape is System.Windows.Shapes.Rectangle r) {
+          isTooSmall = r.Width < 2 && r.Height < 2;
+        } else if (_currentDrawingShape is System.Windows.Shapes.Path) {
+          var endP = e.GetPosition(AnnotationCanvas);
+          var dist = Math.Sqrt(Math.Pow(endP.X - _drawingStartPoint.X, 2) + Math.Pow(endP.Y - _drawingStartPoint.Y, 2));
+          isTooSmall = dist < 3;
+        } else if (_currentDrawingShape is System.Windows.Shapes.Line line) {
+          var dist = Math.Sqrt(Math.Pow(line.X2 - line.X1, 2) + Math.Pow(line.Y2 - line.Y1, 2));
+          isTooSmall = dist < 3;
+        }
 
-      if (isTooSmall) {
-        AnnotationCanvas.Children.Remove(_currentDrawingShape);
-      } else {
-        _annotationHistory.Add(_currentDrawingShape);
-        BtnUndo.IsEnabled = true;
-      }
+        if (isTooSmall) {
+          AnnotationCanvas.Children.Remove(_currentDrawingShape);
+        } else {
+          _annotationHistory.Add(_currentDrawingShape);
+          BtnUndo.IsEnabled = true;
+        }
 
-      _currentDrawingShape = null;
+        _currentDrawingShape = null;
+      }
     }
   }
 
@@ -330,31 +347,39 @@ public partial class OverlayWindow : Window {
     SetActiveTool(_activeTool == AnnotationTool.Arrow ? AnnotationTool.None : AnnotationTool.Arrow);
   }
 
+  private void OnToolLineClick(object sender, RoutedEventArgs e) {
+    SetActiveTool(_activeTool == AnnotationTool.Line ? AnnotationTool.None : AnnotationTool.Line);
+  }
+
   private void SetActiveTool(AnnotationTool tool) {
     _activeTool = tool;
 
     var activeBg = new SolidColorBrush(Color.FromArgb(0x55, 0xFF, 0x17, 0x44));
     var activeBorder = new SolidColorBrush(Color.FromRgb(0xFF, 0x17, 0x44));
 
+    BtnToolRect.Background = Brushes.Transparent;
+    BtnToolRect.BorderBrush = Brushes.Transparent;
+    BtnToolArrow.Background = Brushes.Transparent;
+    BtnToolArrow.BorderBrush = Brushes.Transparent;
+    BtnToolLine.Background = Brushes.Transparent;
+    BtnToolLine.BorderBrush = Brushes.Transparent;
+
     if (_activeTool == AnnotationTool.Rectangle) {
       BtnToolRect.Background = activeBg;
       BtnToolRect.BorderBrush = activeBorder;
-      BtnToolArrow.Background = Brushes.Transparent;
-      BtnToolArrow.BorderBrush = Brushes.Transparent;
       Cursor = Cursors.Cross;
       OverlayCanvas.Cursor = Cursors.Cross;
     } else if (_activeTool == AnnotationTool.Arrow) {
       BtnToolArrow.Background = activeBg;
       BtnToolArrow.BorderBrush = activeBorder;
-      BtnToolRect.Background = Brushes.Transparent;
-      BtnToolRect.BorderBrush = Brushes.Transparent;
+      Cursor = Cursors.Cross;
+      OverlayCanvas.Cursor = Cursors.Cross;
+    } else if (_activeTool == AnnotationTool.Line) {
+      BtnToolLine.Background = activeBg;
+      BtnToolLine.BorderBrush = activeBorder;
       Cursor = Cursors.Cross;
       OverlayCanvas.Cursor = Cursors.Cross;
     } else {
-      BtnToolRect.Background = Brushes.Transparent;
-      BtnToolRect.BorderBrush = Brushes.Transparent;
-      BtnToolArrow.Background = Brushes.Transparent;
-      BtnToolArrow.BorderBrush = Brushes.Transparent;
       Cursor = Cursors.Arrow;
       OverlayCanvas.Cursor = Cursors.Arrow;
     }
