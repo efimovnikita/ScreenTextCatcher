@@ -1,0 +1,8 @@
+{
+  "track_id": "line_annotation_20261009",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-10-09T12:53:30Z",
+  "updated_at": "2026-10-09T12:53:30Z",
+  "description": "Инструмент аннотации «Линия» (Line Annotation Tool) с выравниванием по Shift (Angle Snapping) и публикация релиза v1.3.0"
+}
