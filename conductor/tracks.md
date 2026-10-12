@@ -8,3 +8,7 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/screentextcatcher_mvp_20261006/](./tracks/screentextcatcher_mvp_20261006/)*
 
 
+---
+
+- [ ] **Track: Окно просмотра захваченной области («Pin / Закрепить»)**
+  *Link: [./tracks/pinned_viewer_20261012/](./tracks/pinned_viewer_20261012/)*
