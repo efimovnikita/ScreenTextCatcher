@@ -54,6 +54,7 @@ public partial class OverlayWindow : Window {
 
   public event Action<Rectangle>? AreaSelected;
   public event Action<byte[], bool>? ScreenshotReady;
+  public event Action<byte[], Rect>? PinRequested;
   public event Action? Cancelled;
 
   public OverlayWindow(bool isScreenshotMode = false) {
@@ -398,6 +399,17 @@ public partial class OverlayWindow : Window {
     }
   }
 
+  private void OnPinClick(object sender, RoutedEventArgs e) {
+    var pngBytes = RenderCompositeScreenshot();
+    var absoluteSelectionRect = new Rect(
+        Left + _selectedAreaRect.Left,
+        Top + _selectedAreaRect.Top,
+        _selectedAreaRect.Width,
+        _selectedAreaRect.Height);
+    Close();
+    PinRequested?.Invoke(pngBytes, absoluteSelectionRect);
+  }
+
   private void OnCopyImageClick(object sender, RoutedEventArgs e) {
     FinishAndExportScreenshot(copyImageToClipboard: true);
   }
@@ -411,8 +423,12 @@ public partial class OverlayWindow : Window {
   }
 
   private void FinishAndExportScreenshot(bool copyImageToClipboard = false) {
-    byte[] pngBytes;
+    var pngBytes = RenderCompositeScreenshot();
+    Close();
+    ScreenshotReady?.Invoke(pngBytes, copyImageToClipboard);
+  }
 
+  private byte[] RenderCompositeScreenshot() {
     var cropX = (int)Math.Max(0, _selectedAreaRect.Left * _dpiScaleX);
     var cropY = (int)Math.Max(0, _selectedAreaRect.Top * _dpiScaleY);
     var cropW = (int)Math.Max(1, _selectedAreaRect.Width * _dpiScaleX);
@@ -425,7 +441,7 @@ public partial class OverlayWindow : Window {
 
     if (_annotationHistory.Count == 0 && _frozenScreenBitmap != null) {
       var captureService = new ScreenCaptureService();
-      pngBytes = captureService.CropToPngBytes(_frozenScreenBitmap, new Rectangle(cropX, cropY, cropW, cropH));
+      return captureService.CropToPngBytes(_frozenScreenBitmap, new Rectangle(cropX, cropY, cropW, cropH));
     } else if (_frozenScreenBitmap != null && cropW > 0 && cropH > 0) {
       using var croppedBmp = _frozenScreenBitmap.Clone(new Rectangle(cropX, cropY, cropW, cropH), _frozenScreenBitmap.PixelFormat);
       var bgSource = ImageConversionHelper.ToBitmapSource(croppedBmp);
@@ -433,7 +449,7 @@ public partial class OverlayWindow : Window {
       // Detach shapes from AnnotationCanvas so they can be added to the standalone exportCanvas
       AnnotationCanvas.Children.Clear();
 
-      pngBytes = AnnotationExportHelper.CompositeAndRenderToPng(
+      return AnnotationExportHelper.CompositeAndRenderToPng(
           bgSource,
           _annotationHistory,
           _selectedAreaRect.Width,
@@ -441,11 +457,8 @@ public partial class OverlayWindow : Window {
           _dpiScaleX,
           _dpiScaleY);
     } else {
-      pngBytes = Array.Empty<byte>();
+      return Array.Empty<byte>();
     }
-
-    Close();
-    ScreenshotReady?.Invoke(pngBytes, copyImageToClipboard);
   }
 
   private void CancelSelection() {

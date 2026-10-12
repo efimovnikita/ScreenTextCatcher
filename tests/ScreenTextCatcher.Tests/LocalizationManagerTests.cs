@@ -114,5 +114,17 @@ public class LocalizationManagerTests
         Assert.Equal("Copy image to clipboard and save to disk", LocalizationManager.GetString("Loc_AnnotateToolbarCopyTooltip"));
         Assert.Equal("Screenshot saved to disk and copied to clipboard as image: {0}", LocalizationManager.GetString("Loc_LogScreenshotImageCopied"));
     }
+
+    [Fact]
+    public void PinnedViewer_Keys_ExistInBothLanguages()
+    {
+        LocalizationManager.SetLanguage("ru");
+        Assert.Equal("Закрепить на экране (окно просмотра)", LocalizationManager.GetString("Loc_AnnotateToolbarPinTooltip"));
+        Assert.Equal("ScreenTextCatcher — Просмотр ({0} × {1})", LocalizationManager.GetString("Loc_PinnedViewerTitle"));
+
+        LocalizationManager.SetLanguage("en");
+        Assert.Equal("Pin on screen (view window)", LocalizationManager.GetString("Loc_AnnotateToolbarPinTooltip"));
+        Assert.Equal("ScreenTextCatcher — View ({0} × {1})", LocalizationManager.GetString("Loc_PinnedViewerTitle"));
+    }
 }
 

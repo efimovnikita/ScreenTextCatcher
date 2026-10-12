@@ -85,6 +85,8 @@ public static class LocalizationManager
         ["Loc_AnnotateToolbarUndo"] = "Отменить действие (Ctrl+Z)",
         ["Loc_AnnotateToolbarCopy"] = "Копировать",
         ["Loc_AnnotateToolbarCopyTooltip"] = "Скопировать изображение в буфер обмена и сохранить на диск",
+        ["Loc_AnnotateToolbarPinTooltip"] = "Закрепить на экране (окно просмотра)",
+        ["Loc_PinnedViewerTitle"] = "ScreenTextCatcher — Просмотр ({0} × {1})",
         ["Loc_AnnotateToolbarDone"] = "Сохранить (Enter)",
         ["Loc_AnnotateToolbarCancel"] = "Отмена (Esc)",
 
@@ -205,6 +207,8 @@ public static class LocalizationManager
         ["Loc_AnnotateToolbarUndo"] = "Undo (Ctrl+Z)",
         ["Loc_AnnotateToolbarCopy"] = "Copy",
         ["Loc_AnnotateToolbarCopyTooltip"] = "Copy image to clipboard and save to disk",
+        ["Loc_AnnotateToolbarPinTooltip"] = "Pin on screen (view window)",
+        ["Loc_PinnedViewerTitle"] = "ScreenTextCatcher — View ({0} × {1})",
         ["Loc_AnnotateToolbarDone"] = "Save (Enter)",
         ["Loc_AnnotateToolbarCancel"] = "Cancel (Esc)",
 

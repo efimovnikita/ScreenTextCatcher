@@ -174,6 +174,15 @@
 
                 <Rectangle Width="1" Height="20" Fill="#444444" Margin="6,2"/>
 
+                <!-- Pin Button -->
+                <Button x:Name="BtnPin" 
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        ToolTip="{DynamicResource Loc_AnnotateToolbarPinTooltip}"
+                        Click="OnPinClick"
+                        Margin="2,0,2,0">
+                    <TextBlock Text="📌" FontSize="14" FontWeight="Bold"/>
+                </Button>
+
                 <!-- Copy Image Button -->
                 <Button x:Name="BtnCopyImage" 
                         Style="{StaticResource ToolbarButtonStyle}"

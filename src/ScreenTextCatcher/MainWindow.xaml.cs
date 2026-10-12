@@ -293,6 +293,32 @@ public partial class MainWindow : Window
                     }
                 });
             };
+
+            overlay.PinRequested += (pngBytes, selectionRect) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        var viewer = new Views.PinnedImageViewerWindow(pngBytes, selectionRect);
+                        viewer.Show();
+                        _trayManager?.SetStatus(TrayStatus.Idle);
+                        Log.Information("Открыто окно просмотра закрепленного фрагмента (RAM, {Bytes} байт).", pngBytes.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Ошибка при открытии окна просмотра скриншота: {Message}", ex.Message);
+                    }
+                    finally
+                    {
+                        if (wasVisible)
+                        {
+                            ShowDashboard();
+                        }
+                        UpdateUiState();
+                    }
+                });
+            };
         }
         else
         {
