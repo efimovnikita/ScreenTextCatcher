@@ -10,5 +10,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Окно просмотра захваченной области («Pin / Закрепить»)**
+- [x] **Track: Окно просмотра захваченной области («Pin / Закрепить»)**
   *Link: [./tracks/pinned_viewer_20261012/](./tracks/pinned_viewer_20261012/)*
