@@ -9,6 +9,7 @@
 - **UI Фреймворк**: WPF (Windows Presentation Foundation)
   - Полноэкранный прозрачный оверлей выбора области (`AllowsTransparency="True"`, `WindowStyle="None"`, 50% затемнение, Canvas с контрастной рамкой).
   - Компактные минималистичные окна: Настройки (Settings), Просмотр логов (Log Viewer), История (History).
+  - Независимое окно просмотра `PinnedImageViewerWindow` (`SingleBorderWindow`, темная тема `#212121`, `ScrollViewer` 1:1, мультиоконность с каскадным позиционированием через `PinnedViewerPositioningHelper`).
 - **Системный трей и бренд-ассеты**: Интеграция с треем Windows с контекстным меню и индикацией статуса. Встроенные предкомпилированные многослойные ресурсы .ico (16×16 до 256×256 px) для исполняемого файла, окон WPF и состояний трея (Idle, Processing, Error) без процедурной GDI+ отрисовки.
 - **Глобальные хоткеи**: Win32 P/Invoke (`RegisterHotKey` / `UnregisterHotKey`) через `HwndSource`.
 - **Автозапуск Windows**: Win32 COM Interop (`IShellLinkW` / `IPersistFile`) для генерации ярлыков в `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` без сторонних зависимостей.
@@ -26,6 +27,7 @@
 - **Сервис скриншотов, аннотаций и буфера обмена**:
   - `IScreenshotService` / `ScreenshotService` для сохранения фрагментов экрана в PNG с авто-разрешением коллизий имен файлов.
   - Подсистема аннотаций и экспорта: геометрические хелперы (`AnnotationGeometryHelper`, `ToolbarPositioningHelper`), динамический оверлей со стеком отмены (Undo), композитный рендеринг через `AnnotationExportHelper` (`RenderTargetBitmap` с сохранением DPI масштабирования).
+  - Сервис позиционирования закрепленных окон: `PinnedViewerPositioningHelper` (расчет стартовых габаритов с учетом системных рамок, центрирование на мониторе захвата и каскадный сдвиг +24 px).
   - Алгоритм строгой валидации содержимого буфера обмена и аккумуляции путей с поддержкой разделителей (`NewLine`, `Space`).
   - Поддержка помещения графического изображения в буфер обмена Windows (форматы `BitmapSource` и `PNG` поток с механизмом retry) через метод `IScreenshotService.SaveAndCopyImageToClipboard`.
 
