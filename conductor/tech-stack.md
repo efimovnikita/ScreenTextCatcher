@@ -26,7 +26,7 @@
   - Кадрирование и кодирование в `MemoryStream` (строго без сохранения на диск в режиме OCR).
 - **Сервис скриншотов, аннотаций и буфера обмена**:
   - `IScreenshotService` / `ScreenshotService` для сохранения фрагментов экрана в PNG с авто-разрешением коллизий имен файлов.
-  - Подсистема аннотаций и экспорта: геометрические хелперы (`AnnotationGeometryHelper`, `ToolbarPositioningHelper`), динамический оверлей со стеком отмены (Undo), композитный рендеринг через `AnnotationExportHelper` (`RenderTargetBitmap` с сохранением DPI масштабирования).
+  - Подсистема аннотаций и экспорта: геометрические хелперы (`AnnotationGeometryHelper`, `ToolbarPositioningHelper`), алгоритмы сглаживания контуров свободной формы (Weighted Moving Average, Ramer–Douglas–Peucker, Catmull–Rom to Cubic Bézier), динамический оверлей со стеком отмены (Undo), композитный рендеринг через `AnnotationExportHelper` (`RenderTargetBitmap` с сохранением DPI масштабирования).
   - Сервис позиционирования закрепленных окон: `PinnedViewerPositioningHelper` (расчет стартовых габаритов с учетом системных рамок, центрирование на мониторе захвата и каскадный сдвиг +24 px).
   - Алгоритм строгой валидации содержимого буфера обмена и аккумуляции путей с поддержкой разделителей (`NewLine`, `Space`).
   - Поддержка помещения графического изображения в буфер обмена Windows (форматы `BitmapSource` и `PNG` поток с механизмом retry) через метод `IScreenshotService.SaveAndCopyImageToClipboard`.
