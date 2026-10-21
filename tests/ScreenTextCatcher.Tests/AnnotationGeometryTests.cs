@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -212,5 +214,205 @@ public class AnnotationGeometryTests {
     var near270 = AnnotationGeometryHelper.SnapToAngle(start, new Point(110, 0));
     Assert.Equal(start.X, near270.X, precision: 3);
     Assert.True(near270.Y < start.Y);
+  }
+
+  [Fact]
+  public void SimplifyPoints_CollinearPoints_RemovesRedundantIntermediatePoints() {
+    var points = new List<Point> {
+      new(0, 0),
+      new(10, 0),
+      new(20, 0),
+      new(30, 0),
+      new(40, 0)
+    };
+
+    var simplified = AnnotationGeometryHelper.SimplifyPoints(points, epsilon: 2.5);
+
+    Assert.Equal(2, simplified.Count);
+    Assert.Equal(new Point(0, 0), simplified[0]);
+    Assert.Equal(new Point(40, 0), simplified[1]);
+  }
+
+  [Fact]
+  public void SimplifyPoints_NoisyPoints_FiltersMinorJitterAndPreservesCorners() {
+    // Points along horizontal line with minor jitter (< 2.5 px)
+    var jitterPoints = new List<Point> {
+      new(0, 0),
+      new(10, 1.0),
+      new(20, -1.2),
+      new(30, 0.8),
+      new(40, 0)
+    };
+
+    var filtered = AnnotationGeometryHelper.SimplifyPoints(jitterPoints, epsilon: 2.5);
+    Assert.Equal(2, filtered.Count);
+    Assert.Equal(new Point(0, 0), filtered[0]);
+    Assert.Equal(new Point(40, 0), filtered[1]);
+
+    // Points with a prominent corner (> 2.5 px) and minor jitter along the edges
+    var cornerPoints = new List<Point> {
+      new(0, 0),
+      new(10, 7.8), // slight deviation from chord Y=7.5
+      new(20, 15.0), // sharp peak
+      new(30, 7.2), // slight deviation from chord Y=7.5
+      new(40, 0)
+    };
+
+    var cornerFiltered = AnnotationGeometryHelper.SimplifyPoints(cornerPoints, epsilon: 2.5);
+    Assert.Equal(3, cornerFiltered.Count);
+    Assert.Equal(new Point(0, 0), cornerFiltered[0]);
+    Assert.Equal(new Point(20, 15.0), cornerFiltered[1]);
+    Assert.Equal(new Point(40, 0), cornerFiltered[2]);
+  }
+
+  [Fact]
+  public void SimplifyPoints_EdgeCases_HandlesFewPoints() {
+    var empty = AnnotationGeometryHelper.SimplifyPoints(new List<Point>());
+    Assert.Empty(empty);
+
+    var single = AnnotationGeometryHelper.SimplifyPoints(new List<Point> { new(5, 5) });
+    Assert.Single(single);
+    Assert.Equal(new Point(5, 5), single[0]);
+
+    var two = AnnotationGeometryHelper.SimplifyPoints(new List<Point> { new(0, 0), new(10, 10) });
+    Assert.Equal(2, two.Count);
+    Assert.Equal(new Point(0, 0), two[0]);
+    Assert.Equal(new Point(10, 10), two[1]);
+  }
+
+  [Fact]
+  public void CreateSmoothPathGeometry_EdgeCases_AndTwoPoints() {
+    RunInSta(() => {
+      var geomEmpty = AnnotationGeometryHelper.CreateSmoothPathGeometry(new List<Point>());
+      Assert.Empty(geomEmpty.Figures);
+      Assert.True(geomEmpty.IsFrozen);
+
+      var geomSingle = AnnotationGeometryHelper.CreateSmoothPathGeometry(new List<Point> { new(10, 10) });
+      Assert.Single(geomSingle.Figures);
+      Assert.Empty(geomSingle.Figures[0].Segments);
+
+      var geomTwo = AnnotationGeometryHelper.CreateSmoothPathGeometry(new List<Point> { new(10, 10), new(50, 50) });
+      Assert.Single(geomTwo.Figures);
+      Assert.Single(geomTwo.Figures[0].Segments);
+      Assert.IsType<LineSegment>(geomTwo.Figures[0].Segments[0]);
+      var lineSeg = (LineSegment)geomTwo.Figures[0].Segments[0];
+      Assert.Equal(new Point(50, 50), lineSeg.Point);
+      Assert.True(geomTwo.IsFrozen);
+    });
+  }
+
+  [Fact]
+  public void CreateSmoothPathGeometry_MultiplePoints_GeneratesCubicBezierSegments() {
+    RunInSta(() => {
+      var points = new List<Point> {
+        new(0, 0),
+        new(20, 40),
+        new(50, 10),
+        new(80, 60)
+      };
+
+      var geom = AnnotationGeometryHelper.CreateSmoothPathGeometry(points);
+
+      Assert.Single(geom.Figures);
+      var figure = geom.Figures[0];
+      Assert.Equal(new Point(0, 0), figure.StartPoint);
+      Assert.False(figure.IsClosed);
+      Assert.False(figure.IsFilled);
+
+      // 4 points produce 3 cubic Bezier segments
+      Assert.Equal(3, figure.Segments.Count);
+      foreach (var segment in figure.Segments) {
+        Assert.IsType<BezierSegment>(segment);
+      }
+
+      var lastBezier = (BezierSegment)figure.Segments[2];
+      Assert.Equal(new Point(80, 60), lastBezier.Point3);
+      Assert.True(geom.IsFrozen);
+    });
+  }
+
+  [Fact]
+  public void CreatePenPath_VisualProperties_MatchesAnnotationDesignSystem() {
+    RunInSta(() => {
+      var path = AnnotationGeometryHelper.CreatePenPath();
+
+      Assert.NotNull(path);
+      Assert.Equal(AnnotationGeometryHelper.StrokeThickness, path.StrokeThickness);
+      Assert.True(path.Stroke is SolidColorBrush brush && brush.Color == AnnotationGeometryHelper.AnnotationColor);
+      Assert.Equal(Brushes.Transparent, path.Fill);
+      Assert.Equal(PenLineCap.Round, path.StrokeStartLineCap);
+      Assert.Equal(PenLineCap.Round, path.StrokeEndLineCap);
+      Assert.Equal(PenLineJoin.Round, path.StrokeLineJoin);
+    });
+  }
+
+  [Fact]
+  public void UpdatePenPreview_And_FinalizePenStroke_UpdatesPathDataCorrectly() {
+    RunInSta(() => {
+      var path = AnnotationGeometryHelper.CreatePenPath();
+      var points = new List<Point> {
+        new(0, 0),
+        new(20, 100),
+        new(50, 120),
+        new(80, 100),
+        new(100, 0)
+      };
+
+      // 1. Interactive Preview
+      AnnotationGeometryHelper.UpdatePenPreview(path, points);
+      Assert.NotNull(path.Data);
+      Assert.IsType<PathGeometry>(path.Data);
+      var previewGeom = (PathGeometry)path.Data;
+      Assert.Single(previewGeom.Figures);
+      Assert.Single(previewGeom.Figures[0].Segments);
+      Assert.IsType<PolyLineSegment>(previewGeom.Figures[0].Segments[0]);
+
+      // 2. Finalization with smoothing
+      AnnotationGeometryHelper.FinalizePenStroke(path, points, epsilon: 2.5);
+      Assert.NotNull(path.Data);
+      Assert.IsType<PathGeometry>(path.Data);
+      var finalGeom = (PathGeometry)path.Data;
+      Assert.True(finalGeom.IsFrozen);
+      Assert.Single(finalGeom.Figures);
+      Assert.True(finalGeom.Figures[0].Segments.Count > 0);
+      Assert.IsType<BezierSegment>(finalGeom.Figures[0].Segments[0]);
+    });
+  }
+
+  [Fact]
+  public void SmoothPoints_ReducesJitterAndPreservesEndpoints() {
+    var raw = new List<Point> {
+      new(0, 0),
+      new(10, 10), // jitter
+      new(20, -5), // jitter
+      new(30, 8),  // jitter
+      new(40, 0)
+    };
+
+    var smoothed = AnnotationGeometryHelper.SmoothPoints(raw, iterations: 2);
+
+    Assert.Equal(raw.Count, smoothed.Count);
+    // Endpoints strictly preserved
+    Assert.Equal(raw[0], smoothed[0]);
+    Assert.Equal(raw[^1], smoothed[^1]);
+
+    // Intermediate points have drastically lower variance / jitter
+    Assert.True(Math.Abs(smoothed[1].Y) < Math.Abs(raw[1].Y));
+    Assert.True(Math.Abs(smoothed[2].Y) < Math.Abs(raw[2].Y));
+    Assert.True(Math.Abs(smoothed[3].Y) < Math.Abs(raw[3].Y));
+  }
+
+  [Fact]
+  public void SmoothPoints_EdgeCases_HandlesFewPointsOrZeroIterations() {
+    var empty = AnnotationGeometryHelper.SmoothPoints(new List<Point>());
+    Assert.Empty(empty);
+
+    var two = new List<Point> { new(0, 0), new(10, 10) };
+    var smoothedTwo = AnnotationGeometryHelper.SmoothPoints(two, iterations: 3);
+    Assert.Equal(2, smoothedTwo.Count);
+
+    var three = new List<Point> { new(0, 0), new(5, 5), new(10, 10) };
+    var zeroIter = AnnotationGeometryHelper.SmoothPoints(three, iterations: 0);
+    Assert.Equal(three.Count, zeroIter.Count);
   }
 }

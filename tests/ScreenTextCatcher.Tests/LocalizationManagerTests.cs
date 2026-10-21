@@ -88,6 +88,7 @@ public class LocalizationManagerTests
         Assert.Equal("Рамка", LocalizationManager.GetString("Loc_AnnotateToolbarRect"));
         Assert.Equal("Стрелка", LocalizationManager.GetString("Loc_AnnotateToolbarArrow"));
         Assert.Equal("Линия", LocalizationManager.GetString("Loc_AnnotateToolbarLine"));
+        Assert.Equal("Ручка", LocalizationManager.GetString("Loc_AnnotateToolbarPen"));
         Assert.Equal("Отменить действие (Ctrl+Z)", LocalizationManager.GetString("Loc_AnnotateToolbarUndo"));
         Assert.Equal("Сохранить (Enter)", LocalizationManager.GetString("Loc_AnnotateToolbarDone"));
         Assert.Equal("Отмена (Esc)", LocalizationManager.GetString("Loc_AnnotateToolbarCancel"));
@@ -96,6 +97,7 @@ public class LocalizationManagerTests
         Assert.Equal("Rectangle", LocalizationManager.GetString("Loc_AnnotateToolbarRect"));
         Assert.Equal("Arrow", LocalizationManager.GetString("Loc_AnnotateToolbarArrow"));
         Assert.Equal("Line", LocalizationManager.GetString("Loc_AnnotateToolbarLine"));
+        Assert.Equal("Pen", LocalizationManager.GetString("Loc_AnnotateToolbarPen"));
         Assert.Equal("Undo (Ctrl+Z)", LocalizationManager.GetString("Loc_AnnotateToolbarUndo"));
         Assert.Equal("Save (Enter)", LocalizationManager.GetString("Loc_AnnotateToolbarDone"));
         Assert.Equal("Cancel (Esc)", LocalizationManager.GetString("Loc_AnnotateToolbarCancel"));

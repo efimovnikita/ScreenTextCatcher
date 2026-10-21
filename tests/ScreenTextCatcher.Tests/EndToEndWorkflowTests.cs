@@ -118,7 +118,7 @@ public class EndToEndWorkflowTests : IDisposable
 
                 pngBytes = Core.Helpers.AnnotationExportHelper.RenderVisualToPng(canvas, 300, 200);
 
-                var screenshotService = new ScreenshotService();
+                var screenshotService = new ScreenshotService(clipboardSetter: _ => { });
                 var savedPath = screenshotService.SaveAndAccumulateClipboard(pngBytes, tempFolder, ClipboardDelimiter.NewLine);
 
                 File.Exists(savedPath).Should().BeTrue();
@@ -188,6 +188,67 @@ public class EndToEndWorkflowTests : IDisposable
             clipboardImageBytes.Should().NotBeNull();
             clipboardImageBytes.Should().Equal(pngBytes);
             clipboardText.Should().BeNull(); // Text paths must NOT be accumulated
+        }
+        finally
+        {
+            if (Directory.Exists(tempFolder))
+            {
+                try { Directory.Delete(tempFolder, true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void FullWorkflow_ScreenshotWithPenAnnotation_ExportsAndSavesPng()
+    {
+        var tempFolder = Path.Combine(Path.GetTempPath(), "ScreenTextCatcher_E2E_Pen_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempFolder);
+
+        try
+        {
+            byte[]? pngBytes = null;
+            string? clipboardText = null;
+
+            var thread = new Thread(() =>
+            {
+                var canvas = new System.Windows.Controls.Canvas
+                {
+                    Width = 300,
+                    Height = 200,
+                    ClipToBounds = true
+                };
+
+                var penPath = Core.Helpers.AnnotationGeometryHelper.CreatePenPath();
+                var penPoints = new List<System.Windows.Point>
+                {
+                    new(10, 10),
+                    new(30, 50),
+                    new(80, 20),
+                    new(120, 90)
+                };
+                Core.Helpers.AnnotationGeometryHelper.FinalizePenStroke(penPath, penPoints);
+
+                canvas.Children.Add(penPath);
+
+                canvas.Measure(new System.Windows.Size(300, 200));
+                canvas.Arrange(new System.Windows.Rect(0, 0, 300, 200));
+
+                pngBytes = Core.Helpers.AnnotationExportHelper.RenderVisualToPng(canvas, 300, 200);
+
+                var screenshotService = new ScreenshotService(
+                    clipboardSetter: text => clipboardText = text);
+                var savedPath = screenshotService.SaveAndAccumulateClipboard(pngBytes, tempFolder, ClipboardDelimiter.NewLine);
+
+                File.Exists(savedPath).Should().BeTrue();
+                new FileInfo(savedPath).Length.Should().BeGreaterThan(0);
+                clipboardText.Should().Contain(savedPath);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            pngBytes.Should().NotBeNull();
+            pngBytes!.Length.Should().BeGreaterThan(0);
         }
         finally
         {

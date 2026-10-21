@@ -161,6 +161,14 @@
                     <TextBlock Text="―" FontSize="16" FontWeight="Bold"/>
                 </Button>
 
+                <!-- Pen Tool -->
+                <Button x:Name="BtnToolPen" 
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        ToolTip="{DynamicResource Loc_AnnotateToolbarPen}"
+                        Click="OnToolPenClick">
+                    <TextBlock Text="✏" FontSize="16" FontWeight="Bold"/>
+                </Button>
+
                 <Rectangle Width="1" Height="20" Fill="#444444" Margin="6,2"/>
 
                 <!-- Undo Button -->

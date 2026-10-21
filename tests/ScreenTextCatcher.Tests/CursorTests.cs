@@ -45,7 +45,18 @@ public class CursorTests
 
         // Convert to .CUR file bytes
         using var pngMs = new MemoryStream();
-        bmp.Save(pngMs, ImageFormat.Png);
+        for (int retry = 0; retry < 5; retry++)
+        {
+            try
+            {
+                bmp.Save(pngMs, ImageFormat.Png);
+                break;
+            }
+            catch (ArgumentNullException) when (retry < 4)
+            {
+                System.Threading.Thread.Sleep(50);
+            }
+        }
         var pngBytes = pngMs.ToArray();
 
         using var curMs = new MemoryStream();

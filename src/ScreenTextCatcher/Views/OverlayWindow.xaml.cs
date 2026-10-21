@@ -30,7 +30,8 @@ public partial class OverlayWindow : Window {
     None,
     Rectangle,
     Arrow,
-    Line
+    Line,
+    Pen
   }
 
   private static System.Windows.Input.Cursor? _cachedRedCrosshair;
@@ -40,6 +41,7 @@ public partial class OverlayWindow : Window {
   private AnnotationTool _activeTool = AnnotationTool.None;
 
   private readonly List<UIElement> _annotationHistory = new();
+  private readonly List<Point> _currentPenPoints = new();
   private UIElement? _currentDrawingShape;
 
   private Point _startPoint;
@@ -166,6 +168,10 @@ public partial class OverlayWindow : Window {
           _currentDrawingShape = AnnotationGeometryHelper.CreateArrow(_drawingStartPoint, _drawingStartPoint);
         } else if (_activeTool == AnnotationTool.Line) {
           _currentDrawingShape = AnnotationGeometryHelper.CreateLine(_drawingStartPoint, _drawingStartPoint);
+        } else if (_activeTool == AnnotationTool.Pen) {
+          _currentPenPoints.Clear();
+          _currentPenPoints.Add(_drawingStartPoint);
+          _currentDrawingShape = AnnotationGeometryHelper.CreatePenPath(_currentPenPoints);
         }
 
         if (_currentDrawingShape != null) {
@@ -208,7 +214,21 @@ public partial class OverlayWindow : Window {
       var currentPoint = e.GetPosition(AnnotationCanvas);
       bool isShiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
 
-      if (_currentDrawingShape is System.Windows.Shapes.Rectangle rect) {
+      if (_activeTool == AnnotationTool.Pen && _currentDrawingShape is System.Windows.Shapes.Path penPath) {
+        if (_currentPenPoints.Count == 0) {
+          _currentPenPoints.Add(currentPoint);
+          AnnotationGeometryHelper.UpdatePenPreview(penPath, _currentPenPoints);
+        } else {
+          var lastPoint = _currentPenPoints[^1];
+          double dx = currentPoint.X - lastPoint.X;
+          double dy = currentPoint.Y - lastPoint.Y;
+          double distSq = dx * dx + dy * dy;
+          if (distSq >= AnnotationGeometryHelper.MinPenPointDistance * AnnotationGeometryHelper.MinPenPointDistance) {
+            _currentPenPoints.Add(currentPoint);
+            AnnotationGeometryHelper.UpdatePenPreview(penPath, _currentPenPoints);
+          }
+        }
+      } else if (_currentDrawingShape is System.Windows.Shapes.Rectangle rect) {
         AnnotationGeometryHelper.UpdateRectangle(rect, _drawingStartPoint, currentPoint);
       } else if (_currentDrawingShape is System.Windows.Shapes.Path arrow) {
         var targetPoint = isShiftPressed
@@ -317,7 +337,31 @@ public partial class OverlayWindow : Window {
 
       if (_currentDrawingShape != null) {
         bool isTooSmall = false;
-        if (_currentDrawingShape is System.Windows.Shapes.Rectangle r) {
+        if (_activeTool == AnnotationTool.Pen && _currentDrawingShape is System.Windows.Shapes.Path penPath) {
+          var currentPoint = e.GetPosition(AnnotationCanvas);
+          if (_currentPenPoints.Count > 0) {
+            var lastPoint = _currentPenPoints[^1];
+            double dx = currentPoint.X - lastPoint.X;
+            double dy = currentPoint.Y - lastPoint.Y;
+            if (dx * dx + dy * dy >= 1.0) {
+              _currentPenPoints.Add(currentPoint);
+            }
+          }
+
+          double totalLength = 0.0;
+          for (int i = 1; i < _currentPenPoints.Count; i++) {
+            double dx = _currentPenPoints[i].X - _currentPenPoints[i - 1].X;
+            double dy = _currentPenPoints[i].Y - _currentPenPoints[i - 1].Y;
+            totalLength += Math.Sqrt(dx * dx + dy * dy);
+          }
+
+          if (_currentPenPoints.Count < 2 || totalLength < 3.0) {
+            isTooSmall = true;
+          } else {
+            AnnotationGeometryHelper.FinalizePenStroke(penPath, _currentPenPoints);
+          }
+          _currentPenPoints.Clear();
+        } else if (_currentDrawingShape is System.Windows.Shapes.Rectangle r) {
           isTooSmall = r.Width < 2 && r.Height < 2;
         } else if (_currentDrawingShape is System.Windows.Shapes.Path) {
           var endP = e.GetPosition(AnnotationCanvas);
@@ -352,6 +396,10 @@ public partial class OverlayWindow : Window {
     SetActiveTool(_activeTool == AnnotationTool.Line ? AnnotationTool.None : AnnotationTool.Line);
   }
 
+  private void OnToolPenClick(object sender, RoutedEventArgs e) {
+    SetActiveTool(_activeTool == AnnotationTool.Pen ? AnnotationTool.None : AnnotationTool.Pen);
+  }
+
   private void SetActiveTool(AnnotationTool tool) {
     _activeTool = tool;
 
@@ -364,6 +412,8 @@ public partial class OverlayWindow : Window {
     BtnToolArrow.BorderBrush = Brushes.Transparent;
     BtnToolLine.Background = Brushes.Transparent;
     BtnToolLine.BorderBrush = Brushes.Transparent;
+    BtnToolPen.Background = Brushes.Transparent;
+    BtnToolPen.BorderBrush = Brushes.Transparent;
 
     if (_activeTool == AnnotationTool.Rectangle) {
       BtnToolRect.Background = activeBg;
@@ -378,6 +428,11 @@ public partial class OverlayWindow : Window {
     } else if (_activeTool == AnnotationTool.Line) {
       BtnToolLine.Background = activeBg;
       BtnToolLine.BorderBrush = activeBorder;
+      Cursor = Cursors.Cross;
+      OverlayCanvas.Cursor = Cursors.Cross;
+    } else if (_activeTool == AnnotationTool.Pen) {
+      BtnToolPen.Background = activeBg;
+      BtnToolPen.BorderBrush = activeBorder;
       Cursor = Cursors.Cross;
       OverlayCanvas.Cursor = Cursors.Cross;
     } else {
