@@ -9,6 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Инструмент «Ручка» (Freehand Pen with Smoothing) для режима аннотаций снимков экрана и релиз v1.5.0**
+- [x] **Track: Инструмент «Ручка» (Freehand Pen with Smoothing) для режима аннотаций снимков экрана и релиз v1.5.0**
   *Link: [./tracks/pen_tool_20261021/](./tracks/pen_tool_20261021/)*
 
